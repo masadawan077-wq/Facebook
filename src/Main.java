@@ -402,8 +402,9 @@ public class Main {
             System.out.println("You haven't posted anything yet!");
             return;
         }
-        for (Post post : posts) {
-            Print_Post(post);
+        for (int i = 0; i < posts.size(); i++) {
+            System.out.println("Index = "+(i+1));
+            Print_Post(posts.get(i));
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - -");
         }
     }

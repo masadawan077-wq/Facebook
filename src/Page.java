@@ -848,7 +848,7 @@ public class Page {
         while(true){
             int Unread = unread.size();
             System.out.println("=========================================");
-            System.out.println("            NOTIFICATIONS " + (Unread>0? (unread+"new"):"No new Messages"));
+            System.out.println("            NOTIFICATIONS " + (Unread> 0 ? (Unread+"new"):"No new Messages"));
             System.out.println("=========================================");
             if(unread.isEmpty() && read.isEmpty()) System.out.println("No notifications Yet!");
             else{

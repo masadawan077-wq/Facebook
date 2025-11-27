@@ -27,6 +27,6 @@ public class Notification implements Serializable {
     public void Print_Notificaton(){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
         System.out.println("| "+getType()+" | "+getText());
-        System.out.println("| "+getCreatedAt().format(formatter)+" | "+ (isRead()? "Read": "Unread"));
+        System.out.println("| "+getCreatedAt().format(formatter)+" | "+ (isRead()? "(Read)": "(Unread)"));
     }
 }
