@@ -679,7 +679,7 @@ public class Page {
             switch (Main.Input_Int("Choice")){
                 case 1->{
                     Database.WriteMessage(chat.getFolder_path(), Main.Input_Message());
-                    Database.Write_Notification_Message(chat.getR_username(),chat.getFolder_path(),Main.Input_NotificationM());
+                    Database.Write_Notification(chat.getR_username(),Main.Input_NotificationM());
                     System.out.println("Message sent!");
                 }
                 case 2->{
@@ -737,7 +737,7 @@ public class Page {
                     Message newMessage = Main.Input_Message();
                     Database.WriteMessage(chat.getFolder_path(), newMessage);
                     for(String m : chat.getMembers()){
-                        Database.Write_Notification_Message(m,chat.getFolder_path(),Main.Input_NotificationM());
+                        Database.Write_Notification(m,Main.Input_NotificationM());
                     }
                     System.out.println("Message sent!");
                 }
@@ -843,9 +843,11 @@ public class Page {
 
     public static void Notifications_Page(){
         Database.Compute_Read_Unread();
-        ArrayList<Notification> read = Database.Load_Read_Notifications();
-        ArrayList<Notification> unread = Database.Load_Unread_Notification();
+        ArrayList<Notification> read;
+        ArrayList<Notification> unread;
         while(true){
+            read = Database.Load_Read_Notifications();
+            unread = Database.Load_Unread_Notification();
             int Unread = unread.size();
             System.out.println("=========================================");
             System.out.println("            NOTIFICATIONS " + (Unread> 0 ? (Unread+"new"):"No new Messages"));
@@ -863,6 +865,7 @@ public class Page {
             switch(Main.Input_Int("Choice")){
                 case 1->{
                     Database.Mark_All_Notifications_Read();
+                    Database.Compute_Read_Unread();
                     System.out.println("Marked as read.");
                 }case 2->{
                     Database.Delete_Notifications();

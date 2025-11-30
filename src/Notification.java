@@ -4,8 +4,17 @@ import java.time.format.DateTimeFormatter;
 
 public class Notification implements Serializable {
 
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
     public enum Type { MESSAGE, LIKE, COMMENT, TAG }
 
+    private String sender;
     private Type type;
     private String text;
     private LocalDateTime createdAt;
@@ -16,6 +25,7 @@ public class Notification implements Serializable {
         this.text = text;
         this.createdAt = LocalDateTime.now();
         this.read = false;
+        sender = Main.current.getCredentials().getUsername();
     }
 
     public Type getType() { return type; }

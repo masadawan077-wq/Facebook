@@ -703,25 +703,13 @@ public class Database {
         File userFolder = new File(Notificationsfolder, username);
         if (!userFolder.exists()) userFolder.mkdirs();
         String ts = safeTimestamp(notification.getCreatedAt());
-        File file = new File(userFolder, ts  + Main.current.getCredentials().getUsername()+".dat");
+        File file = new File(userFolder, ts  + notification.getSender()+".dat");
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(notification);
         } catch (Exception s){
             System.out.println("Error Writing notification");
         }
     }
-
-    public static void Write_Notification_Message(String username,String filename ,Notification notification){
-        File userFolder = new File(Notificationsfolder, username);
-        if (!userFolder.exists()) userFolder.mkdirs();
-        File file = new File(userFolder, filename  +".dat");
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
-            out.writeObject(notification);
-        } catch (Exception s){
-            System.out.println("Error Writing notification");
-        }
-    }
-
     public static void Compute_Read_Unread(){
         read  = new ArrayList<>();
         unread = new ArrayList<>();
@@ -751,9 +739,9 @@ public class Database {
 
     public static void Mark_All_Notifications_Read(){
         File userFolder = new File(Notificationsfolder, Main.current.getCredentials().getUsername());
-        for (Notification r: read){
+        for (Notification r: unread){
             String ts = safeTimestamp(r.getCreatedAt());
-            File file = new File(userFolder, ts + ".dat");
+            File file = new File(userFolder, ts  + r.getSender()+".dat");
             r.markRead();
             try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
                 out.writeObject(r);
@@ -768,6 +756,8 @@ public class Database {
         File[] files = userFolder.listFiles();
         if (files == null) return;
         for (File f : files) f.delete();
+        read = new ArrayList<>();
+        unread = new ArrayList<>();
     }
 
 }
