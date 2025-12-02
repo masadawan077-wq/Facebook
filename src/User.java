@@ -31,6 +31,10 @@ public class User implements Serializable {
         }
     }
 
+    public String getFullName(){
+        return Firstname+" "+Lastname;
+    }
+
     public String getFirstname() {
         return Firstname;
     }

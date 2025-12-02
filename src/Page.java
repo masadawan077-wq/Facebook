@@ -230,7 +230,7 @@ public class Page {
                     System.out.println("=============================================");
                     Send_Friend_Request(user);
                 }case 3->{
-                    //yeah....soon
+                    // yeah soon
                 }case 0->{
                     return;
                 }
@@ -538,7 +538,7 @@ public class Page {
                             }else{
                                 User temp = Database.LoadUser(friendo);
                                 members.add(friendo);
-                                System.out.println(Main.Get_Full_Name(temp) + " added to group!");
+                                System.out.println(temp.getFullName() + " added to group!");
                             }
                         }else{
                             System.out.println("Maximum Member limit Reached!");
@@ -655,7 +655,7 @@ public class Page {
         ArrayList<Message> messages = Database.Load_ALLMessages(chat.getFolder_path());
         ArrayList<Message> newMessages = new ArrayList<>();
         int previousSize = messages.size();
-        String fullname = Main.Get_Full_Name(Database.LoadUser(chat.getR_username()));
+        String fullname = Main.Get_Fullname(chat.getR_username());
         while (true){
             System.out.println("----------------------------------------------------");
             System.out.println("    " + fullname+"    "+(Database.Check_Online(chat.getR_username())?  "Online 🟢": "Offline 🔴") );
@@ -880,6 +880,7 @@ public class Page {
     public static void home_page(){
         while (Main.current!=null){
             Database.Compute_Read_Unread();
+            ArrayList<Game_Invite> invites = Database.Load_Game_Invites();
             System.out.println("Logged in as: "+Main.current.getCredentials().getUsername());
             System.out.println("__________________________________________");
             System.out.println("           FACEBOOK HOME PAGE");
@@ -891,7 +892,9 @@ public class Page {
             System.out.println("            5- Create Post");
             int Unread = Database.Load_Unread_Notification().size();
             System.out.println("            6- Notifications" + (Unread > 0 ? " ("+Unread+" new)" : ""));
-            System.out.println("            7- Settings");
+            System.out.println("            7- Facebook Games  "+ ((invites.size()>0)? "("+ (invites.size())+")" : ""));
+            System.out.println("            8- Settings");
+            System.out.println("            9- Refresh Page");
             System.out.println("------------------------------------------");
             System.out.println("            0- Logout");
             System.out.println("__________________________________________");
@@ -909,7 +912,11 @@ public class Page {
                 }case 6->{
                     Notifications_Page();
                 }case 7->{
+                    Games_Page();
+                }case 8->{
                     Settings_Page();
+                }case 9->{
+                    System.out.println("Refreshing...");
                 }case 0->{
                     Database.Delete_Online();
                     System.out.println("\t\t\t\tLOGGING OUT");
@@ -946,6 +953,93 @@ public class Page {
                         feeds = newfeed;
                     }else{
                         System.out.println("No new Feed yet!");
+                    }
+                }case 0->{
+                    return;
+                }
+            }
+        }
+    }
+
+    public static void Games_Page(){
+        while (true){
+            ArrayList<Game_Invite> invites = Database.Load_Game_Invites();
+            System.out.println("================================");
+            System.out.println("         Facebook Games");
+            System.out.println("================================");
+            System.out.println("1- Play Games");
+            System.out.println("2- Manage Game Invites "+ ((invites.size()>0)? "("+ (invites.size())+")" : ""));
+            System.out.println("0- Return");
+            System.out.println("================================");
+            switch (Main.Input_Int("Choice")){
+                case 1->{
+                    Play_Games_Page();
+                }case 2->{
+                    Manage_Game_Invites();
+                }case 0->{
+                    return;
+                }
+            }
+        }
+    }
+
+    public static void Play_Games_Page(){
+        ArrayList<Game> games = Main.Get_ALL_games();
+        while (true){
+            System.out.println("================================");
+            System.out.println("            GAMES");
+            System.out.println("================================");
+            Main.Print_Games(games);
+            System.out.println("================================");
+            System.out.println("1- Chose Game");
+            System.out.println("0- Return");
+            switch (Main.Input_Int("Choice")){
+                case 1->{
+                    int index = Main.Input_Int("Index");
+                    if(index< 1 || index > games.size()){
+                        System.out.println("Invalid Index");
+                    }else{
+                        Game game = games.get(--index);
+                        game.Game_launch();
+                    }
+                }case 0->{
+                    return;
+                }
+            }
+        }
+    }
+
+    public static void Manage_Game_Invites(){
+        while(true){
+            ArrayList<Game_Invite> invites = Database.Load_Game_Invites();
+            System.out.println("================================");
+            System.out.println("          GAME INVITES");
+            System.out.println("================================");
+            Main.Print_Game_Invites(invites);
+            System.out.println("================================");
+            System.out.println("1- Chose Game Invite");
+            System.out.println("2- Delete Game Invite");
+            System.out.println("0- Return");
+            System.out.println("================================");
+            switch (Main.Input_Int("Choice")){
+                case 1->{
+                    int index = Main.Input_Int("Index");
+                    if(index< 1 || index > invites.size()){
+                        System.out.println("Invalid Index");
+                    }else{
+                        Game_Invite invite = invites.get(--index);
+                        if(invite.getGame() instanceof TicTacToe toe){
+                            toe.Online_game_launch(invite.getFilepath());
+                        }
+                        Database.Delete_Game_invite(invite);
+                    }
+                }case 2->{
+                    int index = Main.Input_Int("Index");
+                    if(index< 1 || index > invites.size()){
+                        System.out.println("Invalid Index");
+                    }else{
+                        Game_Invite invite = invites.get(--index);
+                        Database.Delete_Game_invite(invite);
                     }
                 }case 0->{
                     return;

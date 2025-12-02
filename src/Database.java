@@ -13,12 +13,224 @@ public class Database {
     private static final File Notificationsfolder = new File(Dadyfolder, "Notifications");
     private static final File Feedsfolder = new File(Dadyfolder, "Feeds");
     private static final File Onlinefolder = new File(Dadyfolder, "Online");
+    private static final File Gamesefldr = new File(Dadyfolder, "Games");
+    private static final File TicTacToefldr = new File(Gamesefldr, "TicTacToe");
+
     private static final File FriendRequestsSentfolder = new File(Friendsfolder,"FriendRequestsSent");
     private static final File FriendRequestsRecievedfolder = new File(Friendsfolder,"FriendRequestsRecieved");
     private static ArrayList<Notification> read;
     private static ArrayList<Notification> unread;
 
     private Database(){}
+
+
+    public static void Delete_Game_invite(Game_Invite invite){
+        File fldr = new File(Gamesefldr,Main.current.getCredentials().getUsername());
+        File file = new File(fldr,invite.getFilepath()+invite.getGame().getName());
+        file.delete();
+    }
+
+    public static ArrayList<Game_Invite> Load_Game_Invites(){
+        File fldr = new File(Gamesefldr,Main.current.getCredentials().getUsername());
+        File []files = fldr.listFiles();
+        if(files.length==0) return new ArrayList<>();
+        ArrayList<Game_Invite> invites = new ArrayList<>();
+        for (int i = 0; i < files.length; i++) {
+            try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(files[i]))){
+                invites.add((Game_Invite) in.readObject());
+            }catch (Exception s){
+                System.out.println("error reading file");
+            }
+        }
+        return invites;
+    }
+
+    public static void Write_Game_Invite(String username, Game_Invite invite){
+        File fldr = new File(Gamesefldr,username);
+        File file = new File(fldr,invite.getFilepath()+invite.getGame().getName());
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))){
+            out.writeObject(invite);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+    }
+
+    public static void Delete_Tic_Tac_fldr(String fldrname){
+        File fldr = new File(TicTacToefldr,fldrname);
+        deleteFolderRecursive(fldr);
+    }
+
+    public static Scoreboard Load_Score_board(String fldrname){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File end = new File(fldr,"scoreboard");
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(end))){
+            return (Scoreboard) in.readObject();
+        }catch (Exception s){
+            System.out.println("error reading file");
+        }
+        return null;
+    }
+
+    public static void Write_Score_board(String fldrname,Scoreboard scoreboard){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File end = new File(fldr,"scoreboard");
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(end))){
+            out.writeObject(scoreboard);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+    }
+
+    public static boolean Check_Online_Game(String fldrname,String user){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File end = new File(fldr,user);
+        return end.exists();
+    }
+
+    public static void Delete_Online_Game(String fldrname, String user){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File end = new File(fldr,user);
+        end.delete();
+    }
+
+    public static void Write_Online_Game(String fldrname, String user){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File end = new File(fldr,user);
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(end))){
+            out.writeObject(user);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+    }
+
+    public static void Delete_END(String fldrname){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File end = new File(fldr,"END");
+        end.delete();
+    }
+
+    public static boolean Check_END(String fldrname){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File end = new File(fldr,"END");
+        return end.exists();
+    }
+
+    public static void Write_END(String fldrname,String player){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File end = new File(fldr,"END");
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(end))){
+            out.writeObject(player);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+    }
+
+    public static String Load_END(String fldrname){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File file = new File(fldr,"END");
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
+            return (String) in.readObject();
+        }catch (Exception s){
+            System.out.println("error reading file");
+        }
+        return null;
+    }
+
+    public static String[] Load_tic_tac_board(String fldrname){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File file = new File(fldr,"board");
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
+            return (String[]) in.readObject();
+        }catch (Exception s){
+            System.out.println("error reading file");
+        }
+        return null;
+    }
+    public static String Load_tic_tac_turn(String fldrname){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File file = new File(fldr,"turn");
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
+            return (String) in.readObject();
+        }catch (Exception s){
+            System.out.println("error reading file");
+        }
+        return null;
+    }
+
+    public static String[] Load_Players(String fldrname){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File file = new File(fldr,"players");
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
+            return (String[]) in.readObject();
+        }catch (Exception s){
+            System.out.println("error reading file");
+        }
+        return null;
+    }
+    public static String[] Load_marks(String fldrname){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File file = new File(fldr,"marks");
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
+            return (String[]) in.readObject();
+        }catch (Exception s){
+            System.out.println("error reading file");
+        }
+        return null;
+    }
+
+    public static void Write_turn(String fldrname, String Turn){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File turn = new File(fldr,"turn");
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(turn))){
+            out.writeObject(Turn);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+    }
+
+    public static void Write_board(String fldrname,String[] board){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File bord = new File(fldr,"board");
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(bord))){
+            out.writeObject(board);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+    }
+
+    public static void Write_tic_tac(String[] board,String fldrname, String Turn, String[] players, String[] marks){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File play = new File(fldr,"players");
+        File mark = new File(fldr,"marks");
+        Write_turn(fldrname,Turn);
+        Write_board(fldrname,board);
+
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(play))){
+            out.writeObject(players);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(mark))){
+            out.writeObject(marks);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+
+    }
+
+    public static void Create_tic_tac(String filename){
+        File fldr = new File(TicTacToefldr,filename);
+        if(!fldr.exists()){
+            fldr.mkdirs();
+        }
+    }
+
+    public static void Create_Games_fldr(String username){
+        File fldr = new File(Gamesefldr,username);
+        if(!fldr.exists()){
+            fldr.mkdirs();
+        }
+    }
 
     public static boolean Check_Database(){
         if(Dadyfolder.exists()) return true;
@@ -157,6 +369,7 @@ public class Database {
         Create_Post_fldr(username);
         Create_Notifications_fldr(username);
         Create_Feeds_fldr(username);
+        Create_Games_fldr(username);
     }
 
     public static void WriteUser(User user){
@@ -572,6 +785,7 @@ public class Database {
         deleteFolderRecursive(new File(Postsfolder, u));
         deleteFolderRecursive(new File(Inboxfolder, u));
         deleteFolderRecursive(new File(Notificationsfolder, u));
+        deleteFolderRecursive(new File(Gamesefldr,u));
 
     }
 
@@ -638,7 +852,7 @@ public class Database {
         }
         ArrayList<User> matchingUsers = new ArrayList<>();
         for(User user : allUsers){
-            String fullname = Main.Get_Full_Name(user);
+            String fullname = user.getFullName();
             if(user.getCredentials().getUsername().equals(Main.current.getCredentials().getUsername())) continue;
             if(user.getFirstname().equalsIgnoreCase(name) || user.getLastname().equalsIgnoreCase(name) || fullname.equalsIgnoreCase(name)){
                 matchingUsers.add(user);

@@ -40,10 +40,6 @@ public class Main {
         Database.WriteFriend("Shansnake");
     }
 
-    public static String Get_Full_Name(User user){
-        return user.getFirstname()+" "+user.getLastname();
-    }
-
     public static boolean Yes_or_No(String n) {
         char choice = ' ';
         System.out.print("Are u sure you want to " + n + " (Y/N): ");
@@ -430,7 +426,7 @@ public class Main {
 
     public static String Get_Fullname(String username) {
         User user = Database.LoadUser(username);
-        return user.getFirstname() + " " + user.getLastname();
+        return user.getFullName();
     }
 
     public static void Input_Post(){
@@ -514,19 +510,41 @@ public class Main {
     }
 
     public static Notification Input_NotificationT() {
-        return new Notification(Notification.Type.TAG, current.getCredentials().getUsername() + " Tagged you in a post");
+        return new Notification(Notification.Type.TAG, current.getFullName() + " Tagged you in a post");
     }
 
     public static Notification Input_NotificationM() {
-        return new Notification(Notification.Type.MESSAGE, current.getCredentials().getUsername() + " Messaged you");
+        return new Notification(Notification.Type.MESSAGE, current.getFullName() + " Messaged you");
     }
 
     public static Notification Input_NotificationC() {
-        return new Notification(Notification.Type.COMMENT, current.getCredentials().getUsername() + " Commented on ur post");
+        return new Notification(Notification.Type.COMMENT, current.getFullName() + " Commented on ur post");
     }
 
     public static Notification Input_NotificationL() {
-        return new Notification(Notification.Type.LIKE, current.getCredentials().getUsername() + " Liked your post");
+        return new Notification(Notification.Type.LIKE, current.getFullName() + " Liked your post");
+    }
+
+    public static ArrayList<Game> Get_ALL_games(){
+        ArrayList<Game> games = new ArrayList<>();
+        games.add(new TicTacToe());
+        return games;
+    }
+
+    public static void Print_Games(ArrayList<Game> games){
+        for (int i = 0; i < games.size(); i++) {
+            System.out.println((i+1));
+            games.get(i).Print_Game_data();
+            System.out.println("-----------------------------------------");
+        }
+    }
+
+    public static void Print_Game_Invites(ArrayList<Game_Invite> invites){
+        for (int i = 0; i < invites.size(); i++) {
+            System.out.println((i+1));
+            invites.get(i).Print_Invite();
+            System.out.println("-----------------------------------------");
+        }
     }
 
 }

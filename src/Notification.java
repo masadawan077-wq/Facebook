@@ -12,7 +12,7 @@ public class Notification implements Serializable {
         this.sender = sender;
     }
 
-    public enum Type { MESSAGE, LIKE, COMMENT, TAG }
+    public enum Type { MESSAGE, LIKE, COMMENT, TAG , GAME}
 
     private String sender;
     private Type type;
