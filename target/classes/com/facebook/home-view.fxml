@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.facebook.HomeController">
+   <top>
+      <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="10.0" styleClass="nav-bar" BorderPane.alignment="CENTER">
+         <children>
+            <Label styleClass="logo-text" text="f" textFill="#1877f2">
+               <font>
+                  <Font name="System Bold" size="40.0" />
+               </font>
+            </Label>
+            <TextField prefHeight="40.0" prefWidth="240.0" promptText="Search Facebook" styleClass="search-field">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </TextField>
+            <Region HBox.hgrow="ALWAYS" />
+            <HBox alignment="CENTER" spacing="5.0">
+               <children>
+                  <Button styleClass="nav-icon-button, active" text="🏠" />
+                  <Button styleClass="nav-icon-button" text="👥" />
+                  <Button styleClass="nav-icon-button" text="📺" />
+                  <Button styleClass="nav-icon-button" text="🏪" />
+                  <Button styleClass="nav-icon-button" text="🎮" />
+               </children>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+               <children>
+                  <Button styleClass="round-button" text="⋮" />
+                  <Button styleClass="round-button" text="💬" />
+                  <Button styleClass="round-button" text="🔔" />
+                  <Button fx:id="profileButton" styleClass="round-button" text="👤" />
+               </children>
+            </HBox>
+         </children>
+      </HBox>
+   </top>
+   <left>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="250.0" style="-fx-background-color: transparent; -fx-background: #f0f2f5;" BorderPane.alignment="CENTER">
+         <content>
+            <VBox spacing="5.0" styleClass="sidebar-wrapper">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+               <children>
+                  <Button fx:id="sidebarProfile" alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="User Name" />
+                  <Button fx:id="friendsButton" alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="👥 Friends" />
+                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="🕒 Memories" />
+                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="🔖 Saved" />
+                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="👥 Groups" />
+                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="📺 Video" />
+                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="🏪 Marketplace" />
+                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="📅 Events" />
+                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="See more" />
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </left>
+   <right>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="250.0" style="-fx-background-color: transparent; -fx-background: #f0f2f5;" BorderPane.alignment="CENTER">
+         <content>
+            <VBox spacing="10.0" styleClass="sidebar-wrapper">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+               <children>
+                  <Label styleClass="section-header" text="Sponsored" />
+                  <VBox spacing="10.0">
+                      <!-- Sponsored Items Placeholder -->
+                      <Label text="Ad 1..." wrapText="true" />
+                      <Label text="Ad 2..." wrapText="true" />
+                  </VBox>
+                  <Separator />
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                     <children>
+                        <Label styleClass="section-header" text="Contacts" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button style="-fx-background-color: transparent;" text="🔍" />
+                        <Button style="-fx-background-color: transparent;" text="⋯" />
+                     </children>
+                  </HBox>
+                  <VBox fx:id="contactsList" spacing="5.0">
+                     <!-- Contacts will be added here dynamically -->
+                  </VBox>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </right>
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: #f0f2f5;" BorderPane.alignment="CENTER">
+         <content>
+            <VBox alignment="TOP_CENTER" spacing="20.0">
+               <padding>
+                  <Insets bottom="20.0" left="40.0" right="40.0" top="20.0" />
+               </padding>
+               <children>
+                  <!-- Create Post Section -->
+                  <VBox spacing="10.0" styleClass="create-post-container">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <Label style="-fx-background-color: #ddd; -fx-background-radius: 50%; -fx-min-width: 40px; -fx-min-height: 40px; -fx-alignment: center;" text="👤" />
+                              <TextField fx:id="postInput" promptText="What's on your mind?" styleClass="search-field" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+                        <Separator />
+                        <HBox alignment="CENTER" spacing="20.0">
+                           <children>
+                              <Button style="-fx-background-color: transparent; -fx-text-fill: #f02849;" text="🎥 Live Video" />
+                              <Button style="-fx-background-color: transparent; -fx-text-fill: #45bd62;" text="📷 Photo/Video" />
+                              <Button style="-fx-background-color: transparent; -fx-text-fill: #f7b928;" text="😊 Feeling/Activity" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+
+                  <!-- Feed Section -->
+                  <VBox fx:id="feedContainer" spacing="15.0">
+                     <!-- Posts will be added here dynamically -->
+                  </VBox>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>

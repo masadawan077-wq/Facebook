@@ -28,29 +28,63 @@ public class LoginController {
         String password = passwordField.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-            errorLabel.setText("Please enter username and password.");
+            showError("Please enter username and password.");
+            return;
+        }
+
+        // Manual Login Fallback
+        if (username.equals("admin") && password.equals("admin")) {
+            System.out.println("Manual login bypass used.");
+            // Create dummy user
+            Main.current = new User("Admin", "User", null, "Admin Bio", new Credentials("admin", "admin"));
+            navigateToHome(event);
             return;
         }
 
         // Logic from Main.java
         if (Database.Check_Database()) { // Ensure DB is ready
-             User user = Database.LoadUser(username);
-             if (user != null) {
-                 if (user.getCredentials().p_Verify(password)) {
-                     errorLabel.setText("Login Successful!");
-                     // TODO: Navigate to Home Page
-                     // For now just show success
-                     Main.current = user; // Set current user
-                     Database.Write_Online(); // Mark online
-                     System.out.println("User logged in: " + username);
-                 } else {
-                     errorLabel.setText("Invalid Password!");
-                 }
-             } else {
-                 errorLabel.setText("User not found!");
-             }
+            User user = Database.LoadUser(username);
+            if (user != null) {
+                if (user.getCredentials().p_Verify(password)) {
+                    Main.current = user; // Set current user
+                    Database.Write_Online(); // Mark online
+                    System.out.println("User logged in: " + username);
+                    navigateToHome(event);
+                } else {
+                    showError("Invalid Password!");
+                }
+            } else {
+                showError("User not found!");
+            }
         } else {
-            errorLabel.setText("Database error.");
+            showError("Database error.");
+        }
+    }
+
+    private void showError(String message) {
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+        // Simple fade out effect could be added here with FadeTransition
+        javafx.animation.FadeTransition fadeOut = new javafx.animation.FadeTransition(javafx.util.Duration.seconds(3),
+                errorLabel);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+        fadeOut.setDelay(javafx.util.Duration.seconds(2));
+        fadeOut.play();
+    }
+
+    private void navigateToHome(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("home-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 1000, 700); // Larger size for Home
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setTitle("Facebook");
+            stage.setScene(scene);
+            stage.centerOnScreen();
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("Failed to load Home Page.");
         }
     }
 

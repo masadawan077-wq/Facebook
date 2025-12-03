@@ -7,42 +7,192 @@
     -fx-text-fill: #1c1e21;
 }
 
-.text-field, .password-field, .date-picker, .text-area {
+.text-field,
+.password-field,
+.date-picker,
+.text-area {
     -fx-background-color: white;
     -fx-border-color: #dddfe2;
     -fx-border-radius: 6px;
     -fx-background-radius: 6px;
-    -fx-padding: 10px;
+    -fx-padding: 12px;
     -fx-font-size: 14px;
+    -fx-transition: border-color 0.2s ease-in-out;
 }
 
-.text-field:focused, .password-field:focused, .date-picker:focused, .text-area:focused {
+.text-field:focused,
+.password-field:focused,
+.date-picker:focused,
+.text-area:focused {
     -fx-border-color: #1877f2;
+    -fx-effect: dropshadow(three-pass-box, rgba(24, 119, 242, 0.2), 5, 0, 0, 0);
 }
 
 .button {
     -fx-background-color: #1877f2;
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
+    -fx-font-size: 16px;
     -fx-padding: 10px 20px;
     -fx-background-radius: 6px;
     -fx-cursor: hand;
+    -fx-transition: -fx-background-color 0.2s ease-in-out;
 }
 
 .button:hover {
     -fx-background-color: #166fe5;
 }
 
+.button:pressed {
+    -fx-background-color: #155db5;
+}
+
 .button.secondary {
     -fx-background-color: #42b72a;
+    -fx-text-fill: white;
 }
 
 .button.secondary:hover {
     -fx-background-color: #36a420;
 }
 
-.error-label {
-    -fx-text-fill: red;
-    -fx-font-size: 12px;
+.button.secondary:pressed {
+    -fx-background-color: #2b8a1d;
+}
+
+.button.transparent {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1877f2;
+    -fx-font-size: 14px;
+}
+
+.button.transparent:hover {
+    -fx-underline: true;
+}
+
+.error-toast {
+    -fx-background-color: #fa3e3e;
+    -fx-text-fill: white;
+    -fx-padding: 10px 20px;
+    -fx-background-radius: 4px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 10, 0, 0, 5);
+}
+
+.logo-text {
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1877f2;
+    -fx-font-size: 48px;
+}
+
+/* --- Home Page Styles --- */
+
+.nav-bar {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 5, 0, 0, 1);
+    -fx-padding: 0 16px;
+}
+
+.search-field {
+    -fx-background-color: #f0f2f5;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-border-color: transparent;
+    -fx-padding: 8px 16px;
+    -fx-text-fill: #050505;
+}
+
+.nav-icon-button {
+    -fx-background-color: transparent;
+    -fx-padding: 10px 30px;
+    -fx-border-bottom-width: 3px;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-text-fill: #65676b;
+    -fx-font-size: 20px;
+}
+
+.nav-icon-button:hover {
+    -fx-background-color: #f2f2f2;
+    -fx-background-radius: 8px;
+}
+
+.nav-icon-button.active {
+    -fx-border-color: transparent transparent #1877f2 transparent;
+    -fx-text-fill: #1877f2;
+}
+
+.round-button {
+    -fx-background-color: #e4e6eb;
+    -fx-background-radius: 50%;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-text-fill: #050505;
+    -fx-font-size: 16px;
+}
+
+.round-button:hover {
+    -fx-background-color: #d8dadf;
+}
+
+.sidebar-wrapper {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+}
+
+.sidebar-item {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-alignment: center-left;
+    -fx-text-fill: #050505;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-transition: -fx-background-color 0.2s ease-in-out;
+}
+
+.sidebar-item:hover {
+    -fx-background-color: #e4e6eb;
+}
+
+.feed-post {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+    -fx-padding: 12px;
+    -fx-spacing: 10px;
+}
+
+.create-post-container {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+    -fx-padding: 12px;
+}
+
+.contact-item {
+    -fx-background-color: transparent;
+    -fx-padding: 8px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-alignment: center-left;
+    -fx-text-fill: #050505;
+    -fx-font-size: 14px;
+    -fx-transition: -fx-background-color 0.2s ease-in-out;
+}
+
+.contact-item:hover {
+    -fx-background-color: #e4e6eb;
+}
+
+.section-header {
+    -fx-text-fill: #65676b;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
 }

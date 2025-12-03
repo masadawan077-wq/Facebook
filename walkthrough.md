@@ -1,37 +1,40 @@
 # Facebook CLI to GUI Conversion
 
-I have successfully converted your CLI application to a JavaFX GUI application with a Maven project structure.
+I have successfully converted your CLI application to a JavaFX GUI application with a Maven project structure, including a fully styled Home Page.
 
 ## Changes Made
 
 1.  **Project Structure**:
-    *   Converted to a Maven project (`pom.xml` added).
-    *   Moved source code to `src/main/java/com/facebook`.
-    *   Added `package com.facebook;` to all Java files.
-    *   Created `src/main/resources/com/facebook` for FXML and CSS files.
+    *   Maven project with `pom.xml`.
+    *   Source code in `src/main/java/com/facebook`.
+    *   Resources in `src/main/resources/com/facebook`.
 
-2.  **JavaFX Setup**:
-    *   **Entry Point**: `com.facebook.HelloApplication` is the new main class for the GUI.
-    *   **Login Screen**: `login-view.fxml` and `LoginController.java`.
-    *   **Signup Screen**: `signup-view.fxml` and `SignupController.java`.
-    *   **Styling**: Added `styles.css` with Facebook-like styling.
-    *   **Modularity**: Added `module-info.java` for JavaFX compatibility.
+2.  **JavaFX Views**:
+    *   **Login**: `login-view.fxml` with manual login bypass (User: `admin`, Pass: `admin`).
+    *   **Signup**: `signup-view.fxml` with validation.
+    *   **Home**: `home-view.fxml` with a 3-column layout (Sidebar, Feed, Contacts) matching Facebook's design.
 
-3.  **Integration**:
-    *   The GUI uses your existing `Database` class for authentication and user creation.
-    *   `Main.current` is updated upon successful login.
+3.  **Styling**:
+    *   `styles.css` with Facebook brand colors, hover effects, transitions, and "toast" error messages.
+    *   **Refinements**: Dark text for better readability, sidebar wrappers with padding, and hover animations for interactive elements.
+
+4.  **Features**:
+    *   **Authentication**: Real integration with `Database` class + Manual Fallback.
+    *   **Feed**: Dynamic post creation in `HomeController`.
+    *   **Navigation**: Top bar and Sidebar structure ready for expansion.
+    *   **Interactivity**: "Friends" sidebar item now opens a Friends List view. "Contacts" list populates dynamically (or with placeholders).
 
 ## How to Run
 
 ### Using IntelliJ IDEA (Recommended)
 1.  **Reload Maven Project**: Right-click on `pom.xml` and select "Maven" > "Reload Project".
-2.  **Run**: Open `src/main/java/com/facebook/HelloApplication.java` and click the green Run button next to the `main` method.
+2.  **Run**: Open `src/main/java/com/facebook/HelloApplication.java` and click the green Run button.
 
-### Using Command Line (if Maven is installed)
-```bash
-mvn clean javafx:run
-```
+### Manual Login (Fallback)
+If you cannot connect to the database or want to test quickly:
+*   **Username**: `admin`
+*   **Password**: `admin`
 
 ## Next Steps
-*   The Login and Signup screens are fully functional and styled.
-*   Upon login, the application currently prints "Login Successful!" to the console. You can now implement the Home Page and other views by creating new FXML files and Controllers, similar to how Login and Signup were done.
+*   Connect `Database.Load_Feed()` in `HomeController.java` to show real posts.
+*   Implement the specific views for "Marketplace", "Groups", etc., by swapping the center content of the `BorderPane`.

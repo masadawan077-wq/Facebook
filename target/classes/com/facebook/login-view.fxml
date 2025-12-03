@@ -13,18 +13,12 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
-    <Label text="facebook" textFill="#1877f2">
-      <font>
-         <Font name="System Bold" size="40.0" />
-      </font>
-      <style>
-         -fx-text-fill: #1877f2;
-      </style>
-    </Label>
-   <TextField fx:id="usernameField" maxWidth="300.0" promptText="Username" />
-   <PasswordField fx:id="passwordField" maxWidth="300.0" promptText="Password" />
-    <Button maxWidth="300.0" onAction="#onLoginButtonClick" text="Log In" />
+    <Label styleClass="logo-text" text="facebook" />
+   <TextField fx:id="usernameField" maxWidth="350.0" promptText="Email or Phone Number" />
+   <PasswordField fx:id="passwordField" maxWidth="350.0" promptText="Password" />
+    <Button maxWidth="350.0" onAction="#onLoginButtonClick" text="Log In" />
+   <Button styleClass="transparent" text="Forgot Password?" />
    <Label text="or" />
    <Button styleClass="secondary" mnemonicParsing="false" onAction="#onSignupButtonClick" text="Create New Account" />
-   <Label fx:id="errorLabel" styleClass="error-label" />
+   <Label fx:id="errorLabel" styleClass="error-toast" visible="false" />
 </VBox>

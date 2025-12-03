@@ -15,10 +15,7 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
-    <Label text="Sign Up">
-      <font>
-         <Font name="System Bold" size="32.0" />
-      </font></Label>
+    <Label styleClass="logo-text" text="facebook" />
     <Label text="It's quick and easy." />
    <TextField fx:id="firstNameField" maxWidth="350.0" promptText="First Name" />
    <TextField fx:id="lastNameField" maxWidth="350.0" promptText="Last Name" />
@@ -28,6 +25,6 @@
    <PasswordField fx:id="passwordField" maxWidth="350.0" promptText="Password" />
    <PasswordField fx:id="confirmPasswordField" maxWidth="350.0" promptText="Confirm Password" />
     <Button styleClass="secondary" maxWidth="200.0" onAction="#onSignupButtonClick" text="Sign Up" />
-   <Button style="-fx-background-color: transparent; -fx-text-fill: #1877f2;" mnemonicParsing="false" onAction="#onBackButtonClick" text="Already have an account?" />
-   <Label fx:id="errorLabel" styleClass="error-label" />
+   <Button styleClass="transparent" mnemonicParsing="false" onAction="#onBackButtonClick" text="Already have an account?" />
+   <Label fx:id="errorLabel" styleClass="error-toast" visible="false" />
 </VBox>
