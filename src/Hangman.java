@@ -39,8 +39,6 @@ public class Hangman extends Game implements Serializable {
 
     public void online_game_launch(String filepath){
         filename = filepath;
-        System.out.println(filepath);
-        System.out.println(turn);
         String current = Main.current.getCredentials().getUsername();
         players = Database.Load_Players(Database.HangManfldr,filepath);
         Database.Write_Online_Game(Database.HangManfldr,filepath,current);
@@ -59,20 +57,19 @@ public class Hangman extends Game implements Serializable {
             }
         }
         turn = Database.Load_turn(Database.HangManfldr,filename);
-        System.out.println(turn);
         word = Database.Load_Word(filename);
-        System.out.println(word);
+        String friend = turn.equals(players[0]) ? players[1] : players[0];
         while (true){
             letters = Database.Load_letters(filename);
-            System.out.println(letters.length);
             found = Database.Load_found_arr(filename);
-            System.out.println(found.length);
             tries = Database.Load_tries(filename);
-            System.out.println(tries);
             System.out.println(player1+ (Database.Check_Online_Game(Database.HangManfldr,filepath, players[0]) ? " Online 🟢": " Offline 🔴"));
             System.out.println(player2+ (Database.Check_Online_Game(Database.HangManfldr,filepath, players[1]) ? " Online 🟢": " Offline 🔴"));
             System.out.println("Turn: " + Main.Get_Fullname(turn));
             Print_s();
+            if(tries==0){
+                Database.Write_END(Database.HangManfldr,filename,friend);
+            }
             System.out.println("1- Guess the letter");
             System.out.println("2- Resign");
             System.out.println("3- Refresh");
@@ -80,6 +77,7 @@ public class Hangman extends Game implements Serializable {
             System.out.println("5- Send Friend notification again");
             System.out.println("-----------------------------------");
             if(Database.Check_END(Database.HangManfldr,filepath)){
+                Database.Write_Word(null,filename);
                 String end = Database.Load_END(Database.HangManfldr,filepath);
                 Scoreboard score = Database.Load_Score_board(Database.HangManfldr,filepath);
                 if (end.equals(players[0])){
@@ -92,7 +90,6 @@ public class Hangman extends Game implements Serializable {
                 System.out.println("\t\t"+Main.Get_Fullname(end)+ " WON");
                 System.out.println("---------------------------");
                 Scoreboard.Print_Score_board(Database.HangManfldr,filename,players);
-                String friend = turn.equals(players[0]) ? players[1] : players[0];
                 Game_End_Online(friend);
                 return;
             }
@@ -108,24 +105,21 @@ public class Hangman extends Game implements Serializable {
                         Check_win();
                         if(win){
                             Database.Write_END(Database.HangManfldr,filename,turn);
-                            Database.Write_Word(null,filename);
                         }
                     }else{
                         System.out.println("Wait for your Turn Please!");
                     }
                 }case 2->{
-                    if(turn.equals(current)){
-                        String friend = turn.equals(players[0]) ? players[1] : players[0];
-                        Database.Write_END(Database.HangManfldr,filename,friend);
-                    }else{
-                        System.out.println("Wait for your Turn Please!");
+                    if(current.equals(players[0])){
+                        Database.Write_END(Database.HangManfldr,filename,players[1]);
+                    }else {
+                        Database.Write_END(Database.HangManfldr,filename,players[0]);
                     }
                 }case 3->{
 
                 }case 4->{
                     Scoreboard.Print_Score_board(Database.HangManfldr,filename,players);
                 }case 5->{
-                    String friend = turn.equals(players[0]) ? players[1] : players[0];
                     if(Database.Check_Online_Game(Database.HangManfldr,filename,friend)){
                         System.out.println("Friend is Already Online");
                     }else{
@@ -147,6 +141,7 @@ public class Hangman extends Game implements Serializable {
             System.out.println("====================================");
             switch (Main.Input_Int("Choice")){
                 case 1->{
+                    Database.Delete_END(Database.HangManfldr,filename);
                     online_game_launch(filename);
                 }case 0->{
                     if(!Database.Check_Online_Game(Database.HangManfldr ,filename,friend)){
@@ -180,7 +175,6 @@ public class Hangman extends Game implements Serializable {
                             turn = curr;
                             players[0] = f; players[1] = curr;
                             Database.Create_GameFiles(Database.HangManfldr,filename);
-                            System.out.println(turn);
                             Database.Write_turn(Database.HangManfldr,filename,turn);
                             Database.Write_players(Database.HangManfldr,filename,players);
                             Database.Write_Notification(f,new Notification(Notification.Type.GAME,(Main.current.getFullName())+" Invited you to play HANGMAN"));
@@ -219,7 +213,7 @@ public class Hangman extends Game implements Serializable {
                 return;
             }
             System.out.println();
-            letter = Main.Input_String("the Guess letter").toUpperCase().charAt(0);
+            letter = Input_letter();
             Game_Mechanics(letter);
             Check_win();
         }
@@ -265,6 +259,7 @@ public class Hangman extends Game implements Serializable {
             tries--;
         }
     }
+
     public boolean Game_MechanicsOnline(char letter,String word){
         boolean f = false;
         for (int i = 0; i < word.length(); i++) {
@@ -275,6 +270,17 @@ public class Hangman extends Game implements Serializable {
                 letters[i]= letter;
             }
         } return f;
+    }
+
+    public char Input_letter(){
+        while (true){
+            char c = Main.Input_String("Guess letter").toUpperCase().charAt(0);
+            if(!Character.isLetter(c)){
+                System.out.println("Must be a letter!");
+            }else {
+                return c;
+            }
+        }
     }
 
     public String Input_word(){

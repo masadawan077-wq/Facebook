@@ -1028,12 +1028,12 @@ public class Page {
                         System.out.println("Invalid Index");
                     }else{
                         Game_Invite invite = invites.get(--index);
+                        Database.Delete_Game_invite(invite);
                         if(invite.getGame() instanceof TicTacToe toe){
                             toe.Online_game_launch(invite.getFilepath());
                         } else if (invite.getGame() instanceof Hangman hangman) {
                             hangman.online_game_launch(invite.getFilepath());
                         }
-                        Database.Delete_Game_invite(invite);
                     }
                 }case 2->{
                     int index = Main.Input_Int("Index");

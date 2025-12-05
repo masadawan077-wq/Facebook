@@ -164,7 +164,7 @@ public class TicTacToe extends Game implements Serializable {
         }
 
     }
-    public boolean Game_End_Online(String friend){
+    public void Game_End_Online(String friend){
         while (true){
             System.out.println("====================================");
             System.out.println("              Game END");
@@ -174,14 +174,16 @@ public class TicTacToe extends Game implements Serializable {
             System.out.println("====================================");
             switch (Main.Input_Int("Choice")){
                 case 1->{
-                    return false;
+                    Database.Delete_END(Database.TicTacToefldr,filename);
+                    Database.Delete_INC(filename);
+                    Online_game_launch(filename);
                 }case 0->{
                     if(!Database.Check_Online_Game(Database.TicTacToefldr ,filename,friend)){
                         Database.Delete_Game_files(Database.TicTacToefldr,filename);
                     }else{
                         Database.Delete_Online_Game(Database.TicTacToefldr,filename,Main.current.getCredentials().getUsername());
                     }
-                    return true;
+                    return;
                 }
             }
         }
@@ -255,23 +257,29 @@ public class TicTacToe extends Game implements Serializable {
                 String end = Database.Load_END(Database.TicTacToefldr,filepath);
                 if(end==null){
                     System.out.println("GAME DRAW");
-                }else{
-                    Scoreboard score = Database.Load_Score_board(Database.TicTacToefldr,filepath);
-                    if (end.equals(players[0])){
-                        score.increment_Score1();
-                    }else{
-                        score.increment_Score2();
+                    if(!Database.Check_INC(filename)){
+                        Scoreboard score = Database.Load_Score_board(Database.TicTacToefldr,filepath);
+                        score.increment_Total();
+                        Database.Write_Score_board(Database.TicTacToefldr,filepath,score);
+                        Database.Write_Incremented(filename);
                     }
-                    Database.Write_Score_board(Database.TicTacToefldr,filepath,score);
+                }else{
+                    if(current.equals(end)){
+                        Scoreboard score = Database.Load_Score_board(Database.TicTacToefldr,filepath);
+                        if (end.equals(players[0])){
+                            score.increment_Score1();
+                        }else{
+                            score.increment_Score2();
+                        }
+                        Database.Write_Score_board(Database.TicTacToefldr,filepath,score);
+                    }
                     System.out.println("---------------------------");
                     System.out.println("\t\t"+Main.Get_Fullname(end)+ " WON");
                     System.out.println("---------------------------");
-                    Scoreboard.Print_Score_board(Database.HangManfldr,filename,players);
                 }
+                Scoreboard.Print_Score_board(Database.TicTacToefldr,filename,players);
                 String friend = players[0].equals(Main.current.getCredentials().getUsername())? players[1] : players[0];
-                if(!Game_End_Online(friend)){
-                    Online_game_launch(filepath);
-                }
+                Game_End_Online(friend);
                 return;
             }
             switch (Main.Input_Int("Choice")){

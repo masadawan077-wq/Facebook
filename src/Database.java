@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Database {
 
-    private static final File Dadyfolder = new File("G:\\Shared drives\\Facebook\\Database");
+    private static final File Dadyfolder = new File("G:\\Shared drives\\Facebook\\Testing\\Database");
     private static final File Userfolder= new File(Dadyfolder,"Users");
     private static final File Inboxfolder= new File(Dadyfolder,"Inboxes");
     private static final File Messagesfolder = new File(Dadyfolder,"Messages");
@@ -88,7 +88,7 @@ public class Database {
 
     public static String Load_Word(String filename){
         File fldr = new File(HangManfldr,filename);
-        File file = new File(fldr,"turn");
+        File file = new File(fldr,"word");
         try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
             return (String) in.readObject();
         }catch (Exception s){
@@ -98,7 +98,7 @@ public class Database {
 
     public static void Write_Word(String word,String filename){
         File fldr = new File(HangManfldr,filename);
-        File file = new File(fldr,"turn");
+        File file = new File(fldr,"word");
         try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))){
             out.writeObject(word);
         }catch (Exception e){
@@ -185,8 +185,30 @@ public class Database {
         }
     }
 
-    public static void Delete_END(String fldrname){
+    public static void Write_Incremented(String fldrname){
         File fldr = new File(TicTacToefldr,fldrname);
+        File end = new File(fldr,"INC");
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(end))){
+            out.writeObject(true);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+    }
+
+    public static void Delete_INC(String fldrname){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File end = new File(fldr,"INC");
+        end.delete();
+    }
+
+    public static boolean Check_INC(String fldrname){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File end = new File(fldr,"INC");
+        return end.exists();
+    }
+
+    public static void Delete_END(File dir,String fldrname){
+        File fldr = new File(dir,fldrname);
         File end = new File(fldr,"END");
         end.delete();
     }
@@ -229,6 +251,17 @@ public class Database {
         return null;
     }
 
+    public static void Write_turn(File dir,String fldrname, String turn){
+        File fldr = new File(dir,fldrname);
+        File file = new File(fldr,"turn");
+        file.delete();
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))){
+            out.writeObject(turn);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+    }
+
     public static String Load_turn(File dir,String fldrname){
         File fldr = new File(dir,fldrname);
         File file = new File(fldr,"turn");
@@ -236,9 +269,10 @@ public class Database {
             return (String) in.readObject();
         }catch (Exception s){
             System.out.println("error reading file");
+            return null;
         }
-        return null;
     }
+
 
     public static String[] Load_Players(File dir,String fldrname){
         File fldr = new File(dir,fldrname);
@@ -261,15 +295,7 @@ public class Database {
         return null;
     }
 
-    public static void Write_turn(File dir,String fldrname, String Turn){
-        File fldr = new File(dir,fldrname);
-        File turn = new File(fldr,"turn");
-        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(turn))){
-            out.writeObject(Turn);
-        }catch (Exception e){
-            System.out.println("error");
-        }
-    }
+
 
     public static void Write_board(String fldrname,String[] board){
         File fldr = new File(TicTacToefldr,fldrname);
@@ -293,7 +319,6 @@ public class Database {
 
     public static void Write_tic_tac(String[] board,String fldrname, String Turn, String[] players, String[] marks){
         File fldr = new File(TicTacToefldr,fldrname);
-        File play = new File(fldr,"players");
         File mark = new File(fldr,"marks");
         Write_turn(TicTacToefldr,fldrname,Turn);
         Write_board(fldrname,board);
