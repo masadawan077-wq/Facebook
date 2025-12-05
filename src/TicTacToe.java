@@ -174,8 +174,13 @@ public class TicTacToe extends Game implements Serializable {
             System.out.println("====================================");
             switch (Main.Input_Int("Choice")){
                 case 1->{
-                    Database.Delete_END(Database.TicTacToefldr,filename);
-                    Database.Delete_INC(filename);
+                    if(!Database.Check_END(Database.TicTacToefldr,filename,"END"+Main.current.getCredentials().getUsername())){
+                        String end = Database.Load_END(Database.TicTacToefldr,filename,"END");
+                        Database.Write_END(Database.TicTacToefldr,filename,end,"END"+friend);
+                        Database.Delete_END(Database.TicTacToefldr,filename,"END");
+                    }else {
+                        Database.Delete_END(Database.TicTacToefldr,filename,"END"+Main.current.getCredentials().getUsername());
+                    }
                     Online_game_launch(filename);
                 }case 0->{
                     if(!Database.Check_Online_Game(Database.TicTacToefldr ,filename,friend)){
@@ -231,6 +236,7 @@ public class TicTacToe extends Game implements Serializable {
 
     public void Online_game_launch(String filepath){
         filename = filepath;
+        boolean END,ZEEND;
         String current = Main.current.getCredentials().getUsername();
         players = Database.Load_Players(Database.TicTacToefldr,filepath);
         marks = Database.Load_marks(filepath);
@@ -242,6 +248,8 @@ public class TicTacToe extends Game implements Serializable {
         while (true){
             board = Database.Load_tic_tac_board(filepath);
             turn = Database.Load_turn(Database.TicTacToefldr,filepath);
+            END = Database.Check_END(Database.TicTacToefldr,filepath,"END");
+            ZEEND = Database.Check_END(Database.TicTacToefldr,filepath,"END"+current);
             mark = turn.equals(players[0])? marks[0] : marks[1];
             System.out.println(player1+ " : " +marks[0] + (Database.Check_Online_Game(Database.TicTacToefldr,filepath, players[0]) ? " Online 🟢": " Offline 🔴"));
             System.out.println(player2+ " : " +marks[1] + (Database.Check_Online_Game(Database.TicTacToefldr ,filepath, players[1]) ? " Online 🟢": " Offline 🔴"));
@@ -253,30 +261,30 @@ public class TicTacToe extends Game implements Serializable {
             System.out.println("4- Check Scoreboard");
             System.out.println("5- Send Friend notification again");
             System.out.println("-----------------------------------");
-            if(Database.Check_END(Database.TicTacToefldr,filepath)){
-                String end = Database.Load_END(Database.TicTacToefldr,filepath);
-                if(end==null){
-                    System.out.println("GAME DRAW");
-                    if(!Database.Check_INC(filename)){
-                        Scoreboard score = Database.Load_Score_board(Database.TicTacToefldr,filepath);
+            if(END || ZEEND){
+                String winner ="";
+                if(END) {
+                    winner = Database.Load_END(Database.TicTacToefldr, filepath, "END");
+                    if (winner == null) {
+                        winner = "Nobody";
+                        Scoreboard score = Database.Load_Score_board(Database.TicTacToefldr, filepath);
                         score.increment_Total();
-                        Database.Write_Score_board(Database.TicTacToefldr,filepath,score);
-                        Database.Write_Incremented(filename);
-                    }
-                }else{
-                    if(current.equals(end)){
-                        Scoreboard score = Database.Load_Score_board(Database.TicTacToefldr,filepath);
-                        if (end.equals(players[0])){
+                        Database.Write_Score_board(Database.TicTacToefldr, filepath, score);
+                    } else {
+                        Scoreboard score = Database.Load_Score_board(Database.TicTacToefldr, filepath);
+                        if (winner.equals(players[0])) {
                             score.increment_Score1();
-                        }else{
+                        } else {
                             score.increment_Score2();
                         }
-                        Database.Write_Score_board(Database.TicTacToefldr,filepath,score);
+                        Database.Write_Score_board(Database.TicTacToefldr, filepath, score);
                     }
-                    System.out.println("---------------------------");
-                    System.out.println("\t\t"+Main.Get_Fullname(end)+ " WON");
-                    System.out.println("---------------------------");
+                }if(ZEEND){
+                    winner = Database.Load_END(Database.TicTacToefldr,filename,"END"+current);
                 }
+                System.out.println("---------------------------");
+                System.out.println("\t\t"+Main.Get_Fullname(winner)+ " WON");
+                System.out.println("---------------------------");
                 Scoreboard.Print_Score_board(Database.TicTacToefldr,filename,players);
                 String friend = players[0].equals(Main.current.getCredentials().getUsername())? players[1] : players[0];
                 Game_End_Online(friend);
@@ -295,9 +303,9 @@ public class TicTacToe extends Game implements Serializable {
                         if(Place_marker(--index,mark)){
                             State state =  Game_mechanic(mark);
                             if(state == State.WIN){
-                                Database.Write_END(Database.TicTacToefldr,filepath,turn);
+                                Database.Write_END(Database.TicTacToefldr,filepath,turn,"END");
                             } else if (state== State.DRAW) {
-                                Database.Write_END(Database.TicTacToefldr,filepath,null);
+                                Database.Write_END(Database.TicTacToefldr,filepath,null,"END");
                             }
                             turn = turn.equals(players[0]) ? players[1] : players[0];
                             Database.Write_board(filepath,board);
@@ -310,7 +318,7 @@ public class TicTacToe extends Game implements Serializable {
                         continue;
                     }
                     String friend = turn.equals(players[0]) ? players[1] : players[0];
-                    Database.Write_END(Database.TicTacToefldr,filepath,friend);
+                    Database.Write_END(Database.TicTacToefldr,filepath,friend,"END");
                 }case 3->{
 
                 }case 4->{

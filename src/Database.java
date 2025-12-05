@@ -17,7 +17,6 @@ public class Database {
     private static final File GameseInvitesfldr = new File(Gamesefldr, "GamesInvites");
     public static final File TicTacToefldr = new File(Gamesefldr, "TicTacToe");
     public static final File HangManfldr = new File(Gamesefldr, "HangMan");
-
     private static final File FriendRequestsSentfolder = new File(Friendsfolder,"FriendRequestsSent");
     private static final File FriendRequestsRecievedfolder = new File(Friendsfolder,"FriendRequestsRecieved");
     private static ArrayList<Notification> read;
@@ -185,43 +184,21 @@ public class Database {
         }
     }
 
-    public static void Write_Incremented(String fldrname){
-        File fldr = new File(TicTacToefldr,fldrname);
-        File end = new File(fldr,"INC");
-        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(end))){
-            out.writeObject(true);
-        }catch (Exception e){
-            System.out.println("error");
-        }
-    }
-
-    public static void Delete_INC(String fldrname){
-        File fldr = new File(TicTacToefldr,fldrname);
-        File end = new File(fldr,"INC");
+    public static void Delete_END(File dir,String fldrname,String END){
+        File fldr = new File(dir,fldrname);
+        File end = new File(fldr,END);
         end.delete();
     }
 
-    public static boolean Check_INC(String fldrname){
-        File fldr = new File(TicTacToefldr,fldrname);
-        File end = new File(fldr,"INC");
+    public static boolean Check_END(File dir,String fldrname,String END){
+        File fldr = new File(dir,fldrname);
+        File end = new File(fldr,END);
         return end.exists();
     }
 
-    public static void Delete_END(File dir,String fldrname){
+    public static void Write_END(File dir,String fldrname,String player,String END){
         File fldr = new File(dir,fldrname);
-        File end = new File(fldr,"END");
-        end.delete();
-    }
-
-    public static boolean Check_END(File dir,String fldrname){
-        File fldr = new File(dir,fldrname);
-        File end = new File(fldr,"END");
-        return end.exists();
-    }
-
-    public static void Write_END(File dir,String fldrname,String player){
-        File fldr = new File(dir,fldrname);
-        File end = new File(fldr,"END");
+        File end = new File(fldr,END);
         try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(end))){
             out.writeObject(player);
         }catch (Exception e){
@@ -229,9 +206,9 @@ public class Database {
         }
     }
 
-    public static String Load_END(File dir,String fldrname){
+    public static String Load_END(File dir,String fldrname,String END){
         File fldr = new File(dir,fldrname);
-        File file = new File(fldr,"END");
+        File file = new File(fldr,END);
         try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
             return (String) in.readObject();
         }catch (Exception s){

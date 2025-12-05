@@ -45,6 +45,7 @@ public class Hangman extends Game implements Serializable {
         String player1 = Main.Get_Fullname(players[0]);
         String player2 = Main.Get_Fullname(players[1]);
         word = Database.Load_Word(filename);
+        boolean END, ZEEND;
         if(word == null){
             if(turn.equals(current)){
                 word = Input_word();
@@ -63,12 +64,14 @@ public class Hangman extends Game implements Serializable {
             letters = Database.Load_letters(filename);
             found = Database.Load_found_arr(filename);
             tries = Database.Load_tries(filename);
+            END = Database.Check_END(Database.HangManfldr,filename,"END");
+            ZEEND = Database.Check_END(Database.HangManfldr,filename,"END"+current);
             System.out.println(player1+ (Database.Check_Online_Game(Database.HangManfldr,filepath, players[0]) ? " Online 🟢": " Offline 🔴"));
             System.out.println(player2+ (Database.Check_Online_Game(Database.HangManfldr,filepath, players[1]) ? " Online 🟢": " Offline 🔴"));
             System.out.println("Turn: " + Main.Get_Fullname(turn));
             Print_s();
             if(tries==0){
-                Database.Write_END(Database.HangManfldr,filename,friend);
+                Database.Write_END(Database.HangManfldr,filename,friend,"END");
             }
             System.out.println("1- Guess the letter");
             System.out.println("2- Resign");
@@ -76,18 +79,24 @@ public class Hangman extends Game implements Serializable {
             System.out.println("4- Check Scoreboard");
             System.out.println("5- Send Friend notification again");
             System.out.println("-----------------------------------");
-            if(Database.Check_END(Database.HangManfldr,filepath)){
-                Database.Write_Word(null,filename);
-                String end = Database.Load_END(Database.HangManfldr,filepath);
-                Scoreboard score = Database.Load_Score_board(Database.HangManfldr,filepath);
-                if (end.equals(players[0])){
-                    score.increment_Score1();
-                }else{
-                    score.increment_Score2();
+
+            if(END || ZEEND){
+                String winner = "";
+                if(END){
+                    Database.Write_Word(null,filename);
+                    winner = Database.Load_END(Database.HangManfldr,filepath,"END");
+                    Scoreboard score = Database.Load_Score_board(Database.HangManfldr,filepath);
+                    if (winner.equals(players[0])){
+                        score.increment_Score1();
+                    }else{
+                        score.increment_Score2();
+                    }
+                    Database.Write_Score_board(Database.HangManfldr,filepath,score);
+                }if(ZEEND){
+                    winner = Database.Load_END(Database.HangManfldr,filepath,"END"+current);
                 }
-                Database.Write_Score_board(Database.HangManfldr,filepath,score);
                 System.out.println("---------------------------");
-                System.out.println("\t\t"+Main.Get_Fullname(end)+ " WON");
+                System.out.println("\t\t"+Main.Get_Fullname(winner)+ " WON");
                 System.out.println("---------------------------");
                 Scoreboard.Print_Score_board(Database.HangManfldr,filename,players);
                 Game_End_Online(friend);
@@ -104,16 +113,16 @@ public class Hangman extends Game implements Serializable {
                         Database.Write_found_arr(found,filename);
                         Check_win();
                         if(win){
-                            Database.Write_END(Database.HangManfldr,filename,turn);
+                            Database.Write_END(Database.HangManfldr,filename,turn,"END");
                         }
                     }else{
                         System.out.println("Wait for your Turn Please!");
                     }
                 }case 2->{
                     if(current.equals(players[0])){
-                        Database.Write_END(Database.HangManfldr,filename,players[1]);
+                        Database.Write_END(Database.HangManfldr,filename,players[1],"END");
                     }else {
-                        Database.Write_END(Database.HangManfldr,filename,players[0]);
+                        Database.Write_END(Database.HangManfldr,filename,players[0],"END");
                     }
                 }case 3->{
 
@@ -141,7 +150,13 @@ public class Hangman extends Game implements Serializable {
             System.out.println("====================================");
             switch (Main.Input_Int("Choice")){
                 case 1->{
-                    Database.Delete_END(Database.HangManfldr,filename);
+                    if(!Database.Check_END(Database.HangManfldr,filename,"END"+Main.current.getCredentials().getUsername())){
+                        String end = Database.Load_END(Database.HangManfldr,filename,"END");
+                        Database.Write_END(Database.HangManfldr,filename,end,"END"+friend);
+                        Database.Delete_END(Database.HangManfldr,filename,"END");
+                    }else {
+                        Database.Delete_END(Database.HangManfldr,filename,"END"+Main.current.getCredentials().getUsername());
+                    }
                     online_game_launch(filename);
                 }case 0->{
                     if(!Database.Check_Online_Game(Database.HangManfldr ,filename,friend)){
