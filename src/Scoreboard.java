@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.Serializable;
 
 public class Scoreboard implements Serializable {
@@ -45,5 +46,17 @@ public class Scoreboard implements Serializable {
 
     public void setTotolgame(int totolgame) {
         this.totolgame = totolgame;
+    }
+
+    public static void Print_Score_board(File dir, String fldrname, String []players){
+        Scoreboard board = Database.Load_Score_board(dir,fldrname);
+        System.out.println("======================================");
+        System.out.println("            Score Board");
+        System.out.println("======================================");
+        System.out.println(Main.Get_Fullname(players[0])+" : " + board.getScore1());
+        System.out.println(Main.Get_Fullname(players[1])+" : " + board.getScore2());
+        System.out.println("Total Games: "+ board.getTotolgame());
+        System.out.println("======================================");
+
     }
 }

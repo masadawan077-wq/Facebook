@@ -14,7 +14,9 @@ public class Database {
     private static final File Feedsfolder = new File(Dadyfolder, "Feeds");
     private static final File Onlinefolder = new File(Dadyfolder, "Online");
     private static final File Gamesefldr = new File(Dadyfolder, "Games");
-    private static final File TicTacToefldr = new File(Gamesefldr, "TicTacToe");
+    private static final File GameseInvitesfldr = new File(Gamesefldr, "GamesInvites");
+    public static final File TicTacToefldr = new File(Gamesefldr, "TicTacToe");
+    public static final File HangManfldr = new File(Gamesefldr, "HangMan");
 
     private static final File FriendRequestsSentfolder = new File(Friendsfolder,"FriendRequestsSent");
     private static final File FriendRequestsRecievedfolder = new File(Friendsfolder,"FriendRequestsRecieved");
@@ -24,14 +26,94 @@ public class Database {
     private Database(){}
 
 
+    public static int Load_tries(String filename){
+        File fldr = new File(HangManfldr,filename);
+        File file = new File(fldr,"Tries");
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
+            return (int) in.readObject();
+        }catch (Exception s){
+            System.out.println("error reading file");
+        }return -1;
+    }
+
+    public static void Write_tries(String filename, int tries){
+        File fldr = new File(HangManfldr,filename);
+        File file = new File(fldr,"Tries");
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))){
+            out.writeObject(tries);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+    }
+
+    public static char[] Load_letters(String filename){
+        File fldr = new File(HangManfldr,filename);
+        File file = new File(fldr,"letters");
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
+            return (char[]) in.readObject();
+        }catch (Exception s){
+            System.out.println("error reading file");
+        }return null;
+    }
+
+    public static void Write_letters(String filename,char[] letters){
+        File fldr = new File(HangManfldr,filename);
+        File file = new File(fldr,"letters");
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))){
+            out.writeObject(letters);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+    }
+
+    public static boolean[] Load_found_arr(String filename){
+        File fldr = new File(HangManfldr,filename);
+        File file = new File(fldr,"found");
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
+            return (boolean[]) in.readObject();
+        }catch (Exception s){
+            System.out.println("error reading file");
+        }return null;
+    }
+
+    public static void Write_found_arr(boolean[] found,String filename){
+        File fldr = new File(HangManfldr,filename);
+        File file = new File(fldr,"found");
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))){
+            out.writeObject(found);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+    }
+
+    public static String Load_Word(String filename){
+        File fldr = new File(HangManfldr,filename);
+        File file = new File(fldr,"turn");
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
+            return (String) in.readObject();
+        }catch (Exception s){
+            System.out.println("error reading file");
+        }return null;
+    }
+
+    public static void Write_Word(String word,String filename){
+        File fldr = new File(HangManfldr,filename);
+        File file = new File(fldr,"turn");
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))){
+            out.writeObject(word);
+        }catch (Exception e){
+            System.out.println("error");
+        }
+    }
+
     public static void Delete_Game_invite(Game_Invite invite){
-        File fldr = new File(Gamesefldr,Main.current.getCredentials().getUsername());
+        File fldr = new File(GameseInvitesfldr,Main.current.getCredentials().getUsername());
         File file = new File(fldr,invite.getFilepath()+invite.getGame().getName());
         file.delete();
     }
 
     public static ArrayList<Game_Invite> Load_Game_Invites(){
-        File fldr = new File(Gamesefldr,Main.current.getCredentials().getUsername());
+        File fldr = new File(GameseInvitesfldr,Main.current.getCredentials().getUsername());
         File []files = fldr.listFiles();
         if(files.length==0) return new ArrayList<>();
         ArrayList<Game_Invite> invites = new ArrayList<>();
@@ -46,7 +128,7 @@ public class Database {
     }
 
     public static void Write_Game_Invite(String username, Game_Invite invite){
-        File fldr = new File(Gamesefldr,username);
+        File fldr = new File(GameseInvitesfldr,username);
         File file = new File(fldr,invite.getFilepath()+invite.getGame().getName());
         try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))){
             out.writeObject(invite);
@@ -55,13 +137,13 @@ public class Database {
         }
     }
 
-    public static void Delete_Tic_Tac_fldr(String fldrname){
-        File fldr = new File(TicTacToefldr,fldrname);
+    public static void Delete_Game_files(File dir,String fldrname){
+        File fldr = new File(dir,fldrname);
         deleteFolderRecursive(fldr);
     }
 
-    public static Scoreboard Load_Score_board(String fldrname){
-        File fldr = new File(TicTacToefldr,fldrname);
+    public static Scoreboard Load_Score_board(File dir,String fldrname){
+        File fldr = new File(dir,fldrname);
         File end = new File(fldr,"scoreboard");
         try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(end))){
             return (Scoreboard) in.readObject();
@@ -71,8 +153,8 @@ public class Database {
         return null;
     }
 
-    public static void Write_Score_board(String fldrname,Scoreboard scoreboard){
-        File fldr = new File(TicTacToefldr,fldrname);
+    public static void Write_Score_board(File dir, String fldrname,Scoreboard scoreboard){
+        File fldr = new File(dir,fldrname);
         File end = new File(fldr,"scoreboard");
         try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(end))){
             out.writeObject(scoreboard);
@@ -81,20 +163,20 @@ public class Database {
         }
     }
 
-    public static boolean Check_Online_Game(String fldrname,String user){
-        File fldr = new File(TicTacToefldr,fldrname);
+    public static boolean Check_Online_Game(File dir,String fldrname,String user){
+        File fldr = new File(dir,fldrname);
         File end = new File(fldr,user);
         return end.exists();
     }
 
-    public static void Delete_Online_Game(String fldrname, String user){
-        File fldr = new File(TicTacToefldr,fldrname);
+    public static void Delete_Online_Game(File dir, String fldrname, String user){
+        File fldr = new File(dir,fldrname);
         File end = new File(fldr,user);
         end.delete();
     }
 
-    public static void Write_Online_Game(String fldrname, String user){
-        File fldr = new File(TicTacToefldr,fldrname);
+    public static void Write_Online_Game(File dir, String fldrname, String user){
+        File fldr = new File(dir,fldrname);
         File end = new File(fldr,user);
         try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(end))){
             out.writeObject(user);
@@ -109,14 +191,14 @@ public class Database {
         end.delete();
     }
 
-    public static boolean Check_END(String fldrname){
-        File fldr = new File(TicTacToefldr,fldrname);
+    public static boolean Check_END(File dir,String fldrname){
+        File fldr = new File(dir,fldrname);
         File end = new File(fldr,"END");
         return end.exists();
     }
 
-    public static void Write_END(String fldrname,String player){
-        File fldr = new File(TicTacToefldr,fldrname);
+    public static void Write_END(File dir,String fldrname,String player){
+        File fldr = new File(dir,fldrname);
         File end = new File(fldr,"END");
         try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(end))){
             out.writeObject(player);
@@ -125,8 +207,8 @@ public class Database {
         }
     }
 
-    public static String Load_END(String fldrname){
-        File fldr = new File(TicTacToefldr,fldrname);
+    public static String Load_END(File dir,String fldrname){
+        File fldr = new File(dir,fldrname);
         File file = new File(fldr,"END");
         try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
             return (String) in.readObject();
@@ -146,8 +228,9 @@ public class Database {
         }
         return null;
     }
-    public static String Load_tic_tac_turn(String fldrname){
-        File fldr = new File(TicTacToefldr,fldrname);
+
+    public static String Load_turn(File dir,String fldrname){
+        File fldr = new File(dir,fldrname);
         File file = new File(fldr,"turn");
         try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
             return (String) in.readObject();
@@ -157,8 +240,8 @@ public class Database {
         return null;
     }
 
-    public static String[] Load_Players(String fldrname){
-        File fldr = new File(TicTacToefldr,fldrname);
+    public static String[] Load_Players(File dir,String fldrname){
+        File fldr = new File(dir,fldrname);
         File file = new File(fldr,"players");
         try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
             return (String[]) in.readObject();
@@ -178,8 +261,8 @@ public class Database {
         return null;
     }
 
-    public static void Write_turn(String fldrname, String Turn){
-        File fldr = new File(TicTacToefldr,fldrname);
+    public static void Write_turn(File dir,String fldrname, String Turn){
+        File fldr = new File(dir,fldrname);
         File turn = new File(fldr,"turn");
         try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(turn))){
             out.writeObject(Turn);
@@ -198,18 +281,24 @@ public class Database {
         }
     }
 
-    public static void Write_tic_tac(String[] board,String fldrname, String Turn, String[] players, String[] marks){
-        File fldr = new File(TicTacToefldr,fldrname);
+    public static void Write_players(File dir,String filename,String[] players){
+        File fldr = new File(dir,filename);
         File play = new File(fldr,"players");
-        File mark = new File(fldr,"marks");
-        Write_turn(fldrname,Turn);
-        Write_board(fldrname,board);
-
         try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(play))){
             out.writeObject(players);
         }catch (Exception e){
             System.out.println("error");
         }
+    }
+
+    public static void Write_tic_tac(String[] board,String fldrname, String Turn, String[] players, String[] marks){
+        File fldr = new File(TicTacToefldr,fldrname);
+        File play = new File(fldr,"players");
+        File mark = new File(fldr,"marks");
+        Write_turn(TicTacToefldr,fldrname,Turn);
+        Write_board(fldrname,board);
+        Write_players(TicTacToefldr,fldrname,players);
+
         try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(mark))){
             out.writeObject(marks);
         }catch (Exception e){
@@ -218,15 +307,16 @@ public class Database {
 
     }
 
-    public static void Create_tic_tac(String filename){
-        File fldr = new File(TicTacToefldr,filename);
+
+    public static void Create_GameFiles(File dir ,String filename){
+        File fldr = new File(dir,filename);
         if(!fldr.exists()){
             fldr.mkdirs();
         }
     }
 
     public static void Create_Games_fldr(String username){
-        File fldr = new File(Gamesefldr,username);
+        File fldr = new File(GameseInvitesfldr,username);
         if(!fldr.exists()){
             fldr.mkdirs();
         }
@@ -785,7 +875,7 @@ public class Database {
         deleteFolderRecursive(new File(Postsfolder, u));
         deleteFolderRecursive(new File(Inboxfolder, u));
         deleteFolderRecursive(new File(Notificationsfolder, u));
-        deleteFolderRecursive(new File(Gamesefldr,u));
+        deleteFolderRecursive(new File(GameseInvitesfldr,u));
 
     }
 

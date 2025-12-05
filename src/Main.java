@@ -528,6 +528,7 @@ public class Main {
     public static ArrayList<Game> Get_ALL_games(){
         ArrayList<Game> games = new ArrayList<>();
         games.add(new TicTacToe());
+        games.add(new Hangman());
         return games;
     }
 

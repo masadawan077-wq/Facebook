@@ -15,24 +15,8 @@ public class Game_Invite implements Serializable {
         return game;
     }
 
-    public void setGame(Game game) {
-        this.game = game;
-    }
-
     public String getFilepath() {
         return filepath;
-    }
-
-    public void setFilepath(String filepath) {
-        this.filepath = filepath;
-    }
-
-    public String getSender() {
-        return sender;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
     }
 
     public void Print_Invite(){
