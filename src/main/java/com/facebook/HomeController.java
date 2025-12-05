@@ -134,7 +134,28 @@ public class HomeController implements Initializable {
         contactBtn.getStyleClass().add("contact-item");
         contactBtn.setMaxWidth(Double.MAX_VALUE);
         contactBtn.setAlignment(Pos.BASELINE_LEFT);
+
+        contactBtn.setOnAction(e -> openChat(name));
+
         contactsList.getChildren().add(contactBtn);
+    }
+
+    private void openChat(String friendName) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("chat-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 500, 600); // Chat window size
+
+            ChatController controller = fxmlLoader.getController();
+            controller.initializeChat(friendName);
+
+            Stage stage = (Stage) contactsList.getScene().getWindow();
+            stage.setTitle("Facebook - Chat with " + friendName);
+            stage.setScene(scene);
+            stage.centerOnScreen();
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void showFriendsView() {

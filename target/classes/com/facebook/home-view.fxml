@@ -50,54 +50,65 @@
       </HBox>
    </top>
    <left>
-      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="250.0" style="-fx-background-color: transparent; -fx-background: #f0f2f5;" BorderPane.alignment="CENTER">
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="280.0" style="-fx-background-color: transparent; -fx-background: #f0f2f5;" BorderPane.alignment="CENTER">
          <content>
-            <VBox spacing="5.0" styleClass="sidebar-wrapper">
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </padding>
-               <children>
-                  <Button fx:id="sidebarProfile" alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="User Name" />
-                  <Button fx:id="friendsButton" alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="👥 Friends" />
-                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="🕒 Memories" />
-                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="🔖 Saved" />
-                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="👥 Groups" />
-                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="📺 Video" />
-                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="🏪 Marketplace" />
-                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="📅 Events" />
-                  <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="See more" />
-               </children>
+            <VBox spacing="10.0" style="-fx-padding: 10px;">
+               <VBox spacing="5.0" styleClass="styled-container">
+                   <padding>
+                      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                   </padding>
+                   <children>
+                      <Button fx:id="sidebarProfile" alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="User Name" />
+                      <Button fx:id="friendsButton" alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="👥 Friends" />
+                      <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="🕒 Memories" />
+                      <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="🔖 Saved" />
+                      <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="👥 Groups" />
+                      <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="📺 Video" />
+                      <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="🏪 Marketplace" />
+                      <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="📅 Events" />
+                      <Button alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="sidebar-item" text="See more" />
+                   </children>
+               </VBox>
             </VBox>
          </content>
       </ScrollPane>
    </left>
    <right>
-      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="250.0" style="-fx-background-color: transparent; -fx-background: #f0f2f5;" BorderPane.alignment="CENTER">
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="280.0" style="-fx-background-color: transparent; -fx-background: #f0f2f5;" BorderPane.alignment="CENTER">
          <content>
-            <VBox spacing="10.0" styleClass="sidebar-wrapper">
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </padding>
-               <children>
-                  <Label styleClass="section-header" text="Sponsored" />
-                  <VBox spacing="10.0">
-                      <!-- Sponsored Items Placeholder -->
-                      <Label text="Ad 1..." wrapText="true" />
-                      <Label text="Ad 2..." wrapText="true" />
-                  </VBox>
-                  <Separator />
-                  <HBox alignment="CENTER_LEFT" spacing="10.0">
-                     <children>
-                        <Label styleClass="section-header" text="Contacts" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Button style="-fx-background-color: transparent;" text="🔍" />
-                        <Button style="-fx-background-color: transparent;" text="⋯" />
-                     </children>
-                  </HBox>
-                  <VBox fx:id="contactsList" spacing="5.0">
-                     <!-- Contacts will be added here dynamically -->
-                  </VBox>
-               </children>
+            <VBox spacing="10.0" style="-fx-padding: 10px;">
+               <VBox spacing="10.0" styleClass="styled-container">
+                   <padding>
+                      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                   </padding>
+                   <children>
+                      <Label styleClass="section-header" text="Sponsored" />
+                      <VBox spacing="10.0">
+                          <!-- Sponsored Items Placeholder -->
+                          <Label text="Ad 1..." wrapText="true" />
+                          <Label text="Ad 2..." wrapText="true" />
+                      </VBox>
+                   </children>
+               </VBox>
+               
+               <VBox spacing="10.0" styleClass="styled-container">
+                   <padding>
+                      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                   </padding>
+                   <children>
+                      <HBox alignment="CENTER_LEFT" spacing="10.0">
+                         <children>
+                            <Label styleClass="section-header" text="Contacts" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Button style="-fx-background-color: transparent;" text="🔍" />
+                            <Button style="-fx-background-color: transparent;" text="⋯" />
+                         </children>
+                      </HBox>
+                      <VBox fx:id="contactsList" spacing="5.0">
+                         <!-- Contacts will be added here dynamically -->
+                      </VBox>
+                   </children>
+               </VBox>
             </VBox>
          </content>
       </ScrollPane>
