@@ -1030,11 +1030,8 @@ public class Database {
             HashSet<String> friends_frndz = Load_Friends_Hash(f);
             for(String frnd: friends_frndz){
                 if(frnd.equals(curr)) continue;
-                if(!main.contains(frnd)) {
-                    if(!friends_of_friends.contains(frnd)){
-                        friends_of_friends.add(frnd);
-                    }
-                }
+                if(main.contains(frnd)) continue;
+                friends_of_friends.add(frnd);
             }
         }
         return new ArrayList<>(friends_of_friends);
@@ -1163,42 +1160,38 @@ public class Database {
         return new ArrayList<>(result);
     }
 
+    public static List<String> Load_everyone(int maxDepth) {
 
-    public static List<String> Load_everyone5() {
-        String username = Main.current.getCredentials().getUsername();
-        int maxDepth = 5;
-        HashSet<String> userFriends = Database.Load_Friends_Hash(username);
-        HashSet<String> visited = new HashSet<>();
-        visited.add(username);
+        String root = Main.current.getCredentials().getUsername();
+
         Queue<BFSNode> queue = new LinkedList<>();
+        HashSet<String> visited = new HashSet<>();
+        visited.add(root);
 
-        for (String friend : userFriends) {
-            queue.add(new BFSNode(friend, 1));
-            visited.add(friend);
-        }
+        queue.add(new BFSNode(root, 0));
 
-        HashSet<String> suggestions = new HashSet<>();
+        HashSet<String> result = new HashSet<>();
 
         while (!queue.isEmpty()) {
             BFSNode current = queue.poll();
-            String currentUser = current.user;
+
+            String user = current.user;
             int depth = current.depth;
 
-            if (depth >= maxDepth) continue;
+            if (depth > 0) {
+                result.add(user);
+            }
 
-            HashSet<String> friendsOfCurrent = Database.Load_Friends_Hash(currentUser);
+            if (depth == maxDepth) continue;
 
-            for (String f : friendsOfCurrent) {
-                if (!visited.contains(f)) {
-                    visited.add(f);
-                    queue.add(new BFSNode(f, depth + 1));
-                    if (!userFriends.contains(f)) {
-                        suggestions.add(f);
-                    }
+            for (String friend : Database.Load_Friends_Hash(user)) {
+                if (!visited.contains(friend)) {
+                    visited.add(friend);
+                    queue.add(new BFSNode(friend, depth + 1));
                 }
             }
         }
-        return new ArrayList<>(suggestions);
+        return new ArrayList<>(result);
     }
 
     static class BFSNode {

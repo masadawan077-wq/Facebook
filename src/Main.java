@@ -471,10 +471,9 @@ public class Main {
                             case 1->{
                                 Add_in_Feed(Database.Load_Friends(curr),path,post,false);
                             }case 2->{
-                                Add_in_Feed(Database.Load_Friends(curr),path,post,false);
-                                Add_in_Feed(Database.Load_Friend_of_Friends(),path,post,false);
+                                Add_in_Feed(Database.Load_everyone(2),path,post,false);
                             }case 3->{
-                                Add_in_Feed(Database.Load_everyone5(),path,post,false);
+                                Add_in_Feed(Database.Load_everyone(6),path,post,false);
                             }default -> {
                                 System.out.println("Invalid Choice!");
                                 running = true;
