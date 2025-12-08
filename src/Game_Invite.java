@@ -1,6 +1,7 @@
 import java.io.Serializable;
 
 public class Game_Invite implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Game game;
     private String sender;
     private String filepath;

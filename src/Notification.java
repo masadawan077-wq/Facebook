@@ -3,7 +3,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Notification implements Serializable {
-
+    private static final long serialVersionUID = 1L;
     public String getSender() {
         return sender;
     }

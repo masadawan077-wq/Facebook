@@ -2,6 +2,8 @@ import java.io.File;
 import java.io.Serializable;
 
 public class Scoreboard implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int score1;
     private int score2;
     private int totolgame;

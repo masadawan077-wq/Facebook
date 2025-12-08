@@ -3,7 +3,7 @@ import java.time.format.DateTimeFormatter;
 
 
 public class Message extends Content implements Serializable {
-
+    private static final long serialVersionUID = 1L;
     public Message(String text, String sender) {
        super(text,sender);
     }

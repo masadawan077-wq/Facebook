@@ -3,6 +3,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String Firstname;
     private String Lastname;
