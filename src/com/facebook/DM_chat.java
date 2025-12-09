@@ -1,3 +1,4 @@
+package com.facebook;
 import java.io.Serializable;
 
 public class DM_chat extends Chat implements Serializable {

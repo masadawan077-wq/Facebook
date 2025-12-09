@@ -1,3 +1,4 @@
+package com.facebook;
 import java.io.*;
 
 public abstract class Chat implements Serializable {

@@ -1,3 +1,4 @@
+package com.facebook;
 import java.io.Serializable;
 
 public class Credentials implements Serializable {
