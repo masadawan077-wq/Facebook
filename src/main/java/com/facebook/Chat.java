@@ -2,6 +2,7 @@ package com.facebook;
 import java.io.*;
 
 public abstract class Chat implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String folder_path;
 

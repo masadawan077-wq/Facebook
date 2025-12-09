@@ -3,7 +3,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public abstract class Content implements Serializable {
-
+    private static final long serialVersionUID = 1L;
     final private LocalDateTime time;
     final private String text;
     final private String sender;

@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Comment extends Content implements Serializable {
-
+    private static final long serialVersionUID = 1L;
     public Comment(String text, String sender) {
         super(text,sender);
     }

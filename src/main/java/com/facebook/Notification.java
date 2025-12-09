@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Notification implements Serializable {
-
+    private static final long serialVersionUID = 1L;
     public String getSender() {
         return sender;
     }
@@ -13,7 +13,7 @@ public class Notification implements Serializable {
         this.sender = sender;
     }
 
-    public enum Type { MESSAGE, LIKE, COMMENT, TAG }
+    public enum Type { MESSAGE, LIKE, COMMENT, TAG , GAME}
 
     private String sender;
     private Type type;

@@ -296,7 +296,6 @@ public class HomeController implements Initializable {
 
     private void logout(ActionEvent event) {
         try {
-            Main.current = null;
             Database.Delete_Online();
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("login-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 600, 400);
