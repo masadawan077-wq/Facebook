@@ -712,6 +712,13 @@ public class TicTacToe extends Game implements Serializable {
         if (m != null)
             marks = m;
 
+        String t = Database.Load_turn(Database.TicTacToefldr, filename);
+        if (t != null) {
+            turn = t;
+        } else if (players[0] != null) {
+            turn = players[0];
+        }
+
         String title = "Tic Tac Toe - Online";
         if (frame == null) {
             setupFrame(title);
