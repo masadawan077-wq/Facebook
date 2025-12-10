@@ -702,10 +702,27 @@ public class TicTacToe extends Game implements Serializable {
 
     public void Online_game_launch(String filepath) {
         filename = filepath;
+
+        // Load Players and Marks (Essential for turn logic and identity)
+        String[] p = Database.Load_Players(Database.TicTacToefldr, filename);
+        if (p != null)
+            players = p;
+
+        String[] m = Database.Load_marks(filename);
+        if (m != null)
+            marks = m;
+
+        String title = "Tic Tac Toe - Online";
+        if (frame == null) {
+            setupFrame(title);
+        }
+
         board_cleaner();
         Database.Write_Online_Game(Database.TicTacToefldr, filepath, Main.current.getCredentials().getUsername());
         Database.Write_board(filepath, board);
-        showGameBoard("Tic Tac Toe - Online", true);
+        showGameBoard(title, true);
+        frame.setVisible(true);
+
         if (onlineTimer != null)
             onlineTimer.stop();
         onlineTimer = new Timer(1000, e -> onlineGameLoop());
