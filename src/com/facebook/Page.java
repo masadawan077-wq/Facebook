@@ -1,11 +1,12 @@
 package com.facebook;
+
 import java.util.*;
 
 public class Page {
 
-    public static boolean login_page(){
-        Main.current  = null;
-        while (true){
+    public static boolean login_page() {
+        Main.current = null;
+        while (true) {
             System.out.println("__________________________________________");
             System.out.println("          FACEBOOK LOGIN PAGE");
             System.out.println("__________________________________________");
@@ -14,24 +15,29 @@ public class Page {
             System.out.println("             3- FORGOT PASSWORD");
             System.out.println("             0- Exit");
             System.out.println("__________________________________________");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     Main.Login();
-                    if(Main.current!=null) return true;
-                }case 2->{
+                    if (Main.current != null)
+                        return true;
+                }
+                case 2 -> {
                     Main.Create_Account();
-                }case 3->{
+                }
+                case 3 -> {
                     Main.Password_change();
-                }case 0->{
+                }
+                case 0 -> {
                     return false;
-                }default -> System.out.println("Invalid Choice! Enter a Valid Choice");
+                }
+                default -> System.out.println("Invalid Choice! Enter a Valid Choice");
             }
         }
     }
 
-    public static void profile_page(){
-        while (true){
-            System.out.println("Logged in as: "+Main.current.getCredentials().getUsername());
+    public static void profile_page() {
+        while (true) {
+            System.out.println("Logged in as: " + Main.current.getCredentials().getUsername());
             System.out.println("__________________________________________");
             System.out.println("                  Profile");
             System.out.println("__________________________________________");
@@ -43,26 +49,30 @@ public class Page {
             System.out.println("         4- View My Posts");
             System.out.println("         0- Return to HomePage");
             System.out.println("__________________________________________");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     View_Friends_List();
-                }case 2->{
+                }
+                case 2 -> {
                     Main.Load_Recieved_Friend_Requestlist();
-                }case 3->{
+                }
+                case 3 -> {
                     Main.Load_Sent_Friend_Requestlist();
-                }case 4->{
+                }
+                case 4 -> {
                     View_My_Posts();
-                }case 0->{
+                }
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void View_Friends_List(){
+    public static void View_Friends_List() {
         ArrayList<String> Friends;
-        while (true){
-            System.out.println("Logged in as: "+Main.current.getCredentials().getUsername());
+        while (true) {
+            System.out.println("Logged in as: " + Main.current.getCredentials().getUsername());
             Friends = Database.Load_Friends(Main.current.getCredentials().getUsername());
             System.out.println("=========================================");
             System.out.println("               FRIENDS LIST");
@@ -74,38 +84,41 @@ public class Page {
             System.out.println("            3- Vist a Friend's Profile");
             System.out.println("            0- Return to Profile");
             System.out.println("=========================================");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     Find_Friends();
-                }case 2->{
-                    if(Friends.isEmpty()){
+                }
+                case 2 -> {
+                    if (Friends.isEmpty()) {
                         System.out.println("No friends to remove!");
                         break;
                     }
                     int index = Main.Input_Int("Index of friend to remove");
-                    if(index<1 || index > Friends.size()){
+                    if (index < 1 || index > Friends.size()) {
                         System.out.println("Invalid Index");
-                    }else{
+                    } else {
                         String friendUsername = Friends.get(--index);
                         User friend = Database.LoadUser(friendUsername);
                         friend.Print_profile();
-                        if(Main.Yes_or_No("remove friend?")){
+                        if (Main.Yes_or_No("remove friend?")) {
                             Database.Delete_Friend_Chat(friendUsername);
                             Database.Delete_Friend(friendUsername);
                             System.out.println("Friend removed successfully!");
                         }
                     }
-                }case 3->{
-                    //creamy deal with ts
-                }case 0->{
+                }
+                case 3 -> {
+                    // creamy deal with ts
+                }
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static String Chose_Friendo(){
-        while (true){
+    public static String Chose_Friendo() {
+        while (true) {
             ArrayList<String> Friends = Database.Load_Friends(Main.current.getCredentials().getUsername());
             System.out.println("=========================================");
             System.out.println("               FRIENDS LIST");
@@ -116,27 +129,31 @@ public class Page {
             System.out.println("            2- Chose Friends in list");
             System.out.println("            3- Search Friends");
             System.out.println("            0- Cancel");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     Find_Friends();
-                }case 2->{
-                    if(Friends.isEmpty()){
+                }
+                case 2 -> {
+                    if (Friends.isEmpty()) {
                         System.out.println("No friends to chose!");
                         break;
                     }
                     int index = Main.Input_Int("Index of friend to chose");
-                    if(index<1 || index > Friends.size()){
+                    if (index < 1 || index > Friends.size()) {
                         System.out.println("Invalid Index");
-                    }else{
+                    } else {
                         return Friends.get(--index);
                     }
-                }case 3->{
+                }
+                case 3 -> {
                     User temp = Main.Find_Friend_ByNAME("Friend's Name");
-                    if(temp==null){
+                    if (temp == null) {
                         System.out.println("No such Friend Found");
                         break;
-                    }return temp.getCredentials().getUsername();
-                }case 0->{
+                    }
+                    return temp.getCredentials().getUsername();
+                }
+                case 0 -> {
                     return null;
                 }
             }
@@ -199,17 +216,23 @@ public class Page {
 
                     switch (choice) {
                         case 1 -> {
-                            if (currentPage < totalPages) currentPage++;
-                            else System.out.println("Already on last page!");
+                            if (currentPage < totalPages)
+                                currentPage++;
+                            else
+                                System.out.println("Already on last page!");
                         }
                         case 2 -> {
-                            if (currentPage > 1) currentPage--;
-                            else System.out.println("Already on first page!");
+                            if (currentPage > 1)
+                                currentPage--;
+                            else
+                                System.out.println("Already on first page!");
                         }
                         case 3 -> {
                             int pageNum = Main.Input_Int("Page Number");
-                            if (pageNum >= 1 && pageNum <= totalPages) currentPage = pageNum;
-                            else System.out.println("Invalid page number!");
+                            if (pageNum >= 1 && pageNum <= totalPages)
+                                currentPage = pageNum;
+                            else
+                                System.out.println("Invalid page number!");
                         }
                         case 4 -> {
                             if (!discover) {
@@ -266,7 +289,8 @@ public class Page {
                 System.out.println("- - - - - - - - - - - - - - - - - - - - - -");
             }
             System.out.println("=============================================");
-            if (!discovery) System.out.println("1- View Mutual Friends");
+            if (!discovery)
+                System.out.println("1- View Mutual Friends");
             System.out.println("2- Send Friend Request");
             System.out.println("3- Visit their profile");
             System.out.println("0- Return");
@@ -282,12 +306,15 @@ public class Page {
                         Main.Print_Friends_List(mutualList != null ? mutualList : new ArrayList<>());
                         System.out.println("=============================================");
                     }
-                }case 2 -> {
+                }
+                case 2 -> {
                     System.out.println("=============================================");
                     Send_Friend_Request(user);
-                }case 3 -> {
+                }
+                case 3 -> {
                     // creamy handle this shit
-                }case 0 -> {
+                }
+                case 0 -> {
                     return;
                 }
                 default -> System.out.println("Invalid Choice!");
@@ -295,8 +322,7 @@ public class Page {
         }
     }
 
-
-    public static void Searching_By_Name(String n){
+    public static void Searching_By_Name(String n) {
         String searchName = Main.Input_String(n);
         List<User> matchingUsers;
 
@@ -305,10 +331,10 @@ public class Page {
             System.out.println("===========================================");
             System.out.println("           Searching People by Name");
             System.out.println("===========================================");
-            if(matchingUsers.isEmpty()){
+            if (matchingUsers.isEmpty()) {
                 System.out.println("\t\t\tNo Users with that name");
-            }else{
-                System.out.println("Users with Name: "+searchName);
+            } else {
+                System.out.println("Users with Name: " + searchName);
                 for (int i = 0; i < matchingUsers.size(); i++) {
                     System.out.print((i + 1) + ") ");
                     matchingUsers.get(i).Print_profile();
@@ -325,18 +351,19 @@ public class Page {
                 }
                 case 2 -> {
                     int index = Main.Input_Int("Index");
-                    if(index<1 || index > matchingUsers.size()){
+                    if (index < 1 || index > matchingUsers.size()) {
                         System.out.println("Invalid Index");
-                    }else {
+                    } else {
                         User temp = matchingUsers.get(--index);
                         temp.Print_profile();
-                        boolean friend= Database.Already_Friend(temp);
-                        if(friend) System.out.println("Friends 🤝");
+                        boolean friend = Database.Already_Friend(temp);
+                        if (friend)
+                            System.out.println("Friends 🤝");
                         System.out.println("=========================================");
                         System.out.println("1- Send Friend Request");
                         System.out.println("0- Cancel");
                         System.out.println("=========================================");
-                        if(Main.Input_Int("Choice")==1){
+                        if (Main.Input_Int("Choice") == 1) {
                             Send_Friend_Request(temp);
                         }
                     }
@@ -348,24 +375,24 @@ public class Page {
         }
     }
 
-    public static void Send_Friend_Request(User user){
+    public static void Send_Friend_Request(User user) {
         boolean friend = Database.Already_Friend(user);
         String username = user.getCredentials().getUsername();
-        if(!friend){
-            if(!Database.F_Request_Already_sent(username)){
+        if (!friend) {
+            if (!Database.F_Request_Already_sent(username)) {
                 Database.WriteFriendRequestRecieved(username);
                 Database.WriteFriendRequestSent(username);
                 System.out.println("Friend Request Sent Successfully!");
-            }else{
+            } else {
                 System.out.println("Friend Request Already Sent");
             }
-        }else{
+        } else {
             System.out.println("Already Friend!");
         }
     }
 
-    public static void Find_Friends(){
-        while (true){
+    public static void Find_Friends() {
+        while (true) {
             System.out.println("__________________________________________");
             System.out.println("              FIND Friends Page");
             System.out.println("__________________________________________");
@@ -373,22 +400,22 @@ public class Page {
             System.out.println("              2- People You May Know");
             System.out.println("              0- Return");
             System.out.println("__________________________________________");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     Searching_By_Name(Main.Input_String("Friend's Name"));
                 }
-                case 2->{
+                case 2 -> {
                     People_you_may_know();
                 }
-                case 0->{
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void Privacy_Settings(){
-        while (true){
+    public static void Privacy_Settings() {
+        while (true) {
             System.out.println("""
                     =========================================
                                    Privacy Settings
@@ -397,22 +424,23 @@ public class Page {
                               2- Turn Privacy Mode OFF
                               0- Return
                     """);
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     System.out.println("Nobody will be able to see ur status as either Online 🟢 or Offline 🔴 ");
-                    if(Main.Yes_or_No("Enable Privacy Mode")){
-                        if(Main.current.getPrivacy()){
+                    if (Main.Yes_or_No("Enable Privacy Mode")) {
+                        if (Main.current.getPrivacy()) {
                             System.out.println("Privacy Mode Already Enabled");
-                        }else {
+                        } else {
                             Main.current.Privacy_Mode_On();
                         }
                     }
-                }case 2->{
+                }
+                case 2 -> {
                     System.out.println("Everyone will be able to see ur  status as either Online 🟢 or Offline 🔴 ");
-                    if(Main.Yes_or_No("Disable Privacy Mode")){
-                        if(!Main.current.getPrivacy()){
+                    if (Main.Yes_or_No("Disable Privacy Mode")) {
+                        if (!Main.current.getPrivacy()) {
                             System.out.println("Privacy Mode Already Disabled");
-                        }else {
+                        } else {
                             Main.current.Privacy_Mode_OFF();
                         }
                     }
@@ -421,9 +449,9 @@ public class Page {
         }
     }
 
-    public static void Settings_Page(){
-        while(true){
-            System.out.println("Logged in as: "+Main.current.getCredentials().getUsername());
+    public static void Settings_Page() {
+        while (true) {
+            System.out.println("Logged in as: " + Main.current.getCredentials().getUsername());
             System.out.println("=========================================");
             System.out.println("               SETTINGS");
             System.out.println("=========================================");
@@ -434,30 +462,36 @@ public class Page {
             System.out.println("        5- Privacy Settings");
             System.out.println("        6- Delete Account");
             System.out.println("        0- Back");
-            switch(Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     Main.current.setFirstname(Main.Input_String("New First Name"));
                     System.out.println("First name updated.");
-                }case 2->{
+                }
+                case 2 -> {
                     Main.current.setLastname(Main.Input_String("New Last Name"));
                     System.out.println("Last name updated.");
-                }case 3->{
+                }
+                case 3 -> {
                     Main.current.setBio(Main.Input_String("New Bio"));
                     System.out.println("Bio updated.");
-                }case 4->{
+                }
+                case 4 -> {
                     Main.current.setBirth(Main.Input_date());
                     System.out.println("Date of Birth Changed!");
-                }case 5->{
+                }
+                case 5 -> {
                     Privacy_Settings();
-                }case 6->{
-                    if(Main.Yes_or_No("Delete account?")){
+                }
+                case 6 -> {
+                    if (Main.Yes_or_No("Delete account?")) {
                         Database.Delete_Acc();
                         Main.current = null;
                         System.out.println("Account deleted. Returning to login.");
                         Database.Delete_Acc();
                         Main.System_Start();
                     }
-                }case 0->{
+                }
+                case 0 -> {
                     return;
                 }
             }
@@ -465,8 +499,8 @@ public class Page {
         }
     }
 
-    public static void View_Post_Details(Post post){
-        while(true){
+    public static void View_Post_Details(Post post) {
+        while (true) {
             boolean hasLiked = Database.Has_Liked(post);
             System.out.println("============================================");
             System.out.println("               POST DETAILS");
@@ -475,57 +509,62 @@ public class Page {
             System.out.println("============================================");
             System.out.println("            1- View Likes");
             System.out.println("            2- View Comments");
-            System.out.println("            3- "+(hasLiked ? "Unlike" : "Like"));
+            System.out.println("            3- " + (hasLiked ? "Unlike" : "Like"));
             System.out.println("            4- Comment");
             System.out.println("            5- Delete Comment");
             System.out.println("            0- Return");
             System.out.println("============================================");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     ArrayList<String> likes = Database.Load_Post_Likes(post);
                     System.out.println("-----------------------------------------");
                     System.out.println("👍 Likes: " + likes.size());
-                    for(int i = 0; i < likes.size(); i++){
+                    for (int i = 0; i < likes.size(); i++) {
                         User liker = Database.LoadUser(likes.get(i));
-                        System.out.println("👍"+liker.getFirstname() + " " + liker.getLastname());
+                        System.out.println("👍" + liker.getFirstname() + " " + liker.getLastname());
                     }
                     System.out.println("-----------------------------------------");
-                }case 2->{
+                }
+                case 2 -> {
                     ArrayList<Comment> comments = Database.Load_Post_Comments(post);
                     Main.Print_Comments(comments);
-                }case 3->{
+                }
+                case 3 -> {
                     if (hasLiked) {
                         Database.Remove_Like(post);
                         System.out.println("Post unliked!");
                     } else {
-                        if(!post.getSender().equals(Main.current.getCredentials().getUsername())){
-                            Database.Write_Notification(post.getSender(),Main.Input_NotificationL());
+                        if (!post.getSender().equals(Main.current.getCredentials().getUsername())) {
+                            Database.Write_Notification(post.getSender(), Main.Input_NotificationL());
                         }
                         String timestamp = Database.safeTimestamp(post.getTime());
-                        String path = timestamp+post.getSender();
-                        for(String f: post.getTagged()){
-                            Database.WriteFeed(path,f,post);
+                        String path = timestamp + post.getSender();
+                        for (String f : post.getTagged()) {
+                            Database.WriteFeed(path, f, post);
                             Database.Write_Notification(f, Main.Input_NotificationL());
                         }
                         Database.Write_Like(post);
                         System.out.println("Post liked!");
                     }
-                }case 4->{
+                }
+                case 4 -> {
                     Database.Write_Comment(post, Main.Input_Comment());
                     System.out.println("Comment added!");
-                    if(!post.getSender().equals(Main.current.getCredentials().getUsername())){
+                    if (!post.getSender().equals(Main.current.getCredentials().getUsername())) {
                         String timestamp = Database.safeTimestamp(post.getTime());
-                        String path = timestamp+post.getSender();
-                        for(String f: post.getTagged()){
-                            Database.WriteFeed(path,f,post);
+                        String path = timestamp + post.getSender();
+                        for (String f : post.getTagged()) {
+                            Database.WriteFeed(path, f, post);
                             Database.Write_Notification(f, Main.Input_NotificationC());
                         }
-                        Database.Write_Notification(post.getSender(),Main.Input_NotificationC());
+                        Database.Write_Notification(post.getSender(), Main.Input_NotificationC());
                     }
-                }case 5->{
+                }
+                case 5 -> {
                     ArrayList<Comment> comments = Database.Load_Post_Comments(post);
                     Main.Print_Comments(comments);
-                    if (comments.isEmpty()) break;
+                    if (comments.isEmpty())
+                        break;
                     int commentIndex = Main.Input_Int("Comment Index to Delete");
                     if (commentIndex < 1 || commentIndex > comments.size()) {
                         System.out.println("Invalid Index");
@@ -538,16 +577,17 @@ public class Page {
                     } else {
                         System.out.println("You can only delete your own comments!");
                     }
-                }case 0-> {
+                }
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void View_My_Posts(){
+    public static void View_My_Posts() {
         ArrayList<Post> posts = Database.Load_User_Posts(Main.current.getCredentials().getUsername());
-        while(true){
+        while (true) {
             System.out.println("=========================================");
             System.out.println("             MY POSTS");
             System.out.println("=========================================");
@@ -555,29 +595,30 @@ public class Page {
             System.out.println("=========================================");
             System.out.println("      1- View Post Details");
             System.out.println("      0- Return to Profile");
-            switch(Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     int index = Main.Input_Int("Post Index");
-                    if(index < 1 || index > posts.size()){
+                    if (index < 1 || index > posts.size()) {
                         System.out.println("Invalid Index");
-                    }else{
+                    } else {
                         View_Post_Details(posts.get(--index));
                     }
-                }case 0->{
+                }
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void Create_Group_Chat(){
+    public static void Create_Group_Chat() {
         final int MAX_SIZE = 1000;
         String groupname, groupdescription;
         ArrayList<String> members = new ArrayList<>();
         members.add(Main.current.getCredentials().getUsername());
-        groupname= Main.Input_String("Group Name");
-        groupdescription= Main.Input_String("Group Description");
-        while (true){
+        groupname = Main.Input_String("Group Name");
+        groupdescription = Main.Input_String("Group Description");
+        while (true) {
             System.out.println("=========================================");
             System.out.println("            CREATE GROUP CHAT");
             System.out.println("=========================================");
@@ -586,70 +627,74 @@ public class Page {
             System.out.println("           3- Proceed");
             System.out.println("           0- Cancel");
             System.out.println("=========================================");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     String friendo = Chose_Friendo();
-                    if(friendo != null){
-                        if(members.size()<=MAX_SIZE){
-                            if(members.contains(friendo)){
+                    if (friendo != null) {
+                        if (members.size() <= MAX_SIZE) {
+                            if (members.contains(friendo)) {
                                 System.out.println("Friend already in group!");
-                            }else{
+                            } else {
                                 User temp = Database.LoadUser(friendo);
                                 members.add(friendo);
                                 System.out.println(temp.getFullName() + " added to group!");
                             }
-                        }else{
+                        } else {
                             System.out.println("Maximum Member limit Reached!");
                         }
                     }
-                }case 2->{
+                }
+                case 2 -> {
                     View_Added_Members_creation(members);
-                }case 3->{
-                    if(members.size() < 2){
+                }
+                case 3 -> {
+                    if (members.size() < 2) {
                         System.out.println("Group must have at least 2 members!");
                         break;
                     }
                     Group_chat groupChat = new Group_chat(groupname, groupdescription, members);
-                    for(String member : members){
+                    for (String member : members) {
                         Database.WriteChat(member, groupChat);
                     }
                     System.out.println("Group chat created successfully!");
                     Group_Chat_Page(groupChat);
                     return;
-                }case 0->{
+                }
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void View_Added_Members_creation(List<String> members){
-        while (true){
-            System.out.println("Added Members: "+members.size());
+    public static void View_Added_Members_creation(List<String> members) {
+        while (true) {
+            System.out.println("Added Members: " + members.size());
             Main.Print_Friends_List(members);
             System.out.println("=========================================");
             System.out.println("1- Remove Member");
             System.out.println("0- Back");
             System.out.println("=========================================");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     int index = Main.Input_Int("Index");
-                    if(index<1 || index > members.size()){
+                    if (index < 1 || index > members.size()) {
                         System.out.println("Invalid Index");
-                    }else {
+                    } else {
                         members.remove(--index);
                     }
-                }case 0->{
+                }
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void Inbox_page(){
+    public static void Inbox_page() {
         ArrayList<Chat> chats = Database.LoadInbox();
         while (true) {
-            System.out.println("Logged in as: "+Main.current.getCredentials().getUsername());
+            System.out.println("Logged in as: " + Main.current.getCredentials().getUsername());
             System.out.println("__________________________________________");
             System.out.println("            FACEBOOK Messenger");
             System.out.println("__________________________________________");
@@ -663,60 +708,66 @@ public class Page {
             System.out.println("__________________________________________");
             switch (Main.Input_Int("Choice")) {
                 case 1 -> {
-                    if(chats.isEmpty()){
+                    if (chats.isEmpty()) {
                         System.out.println("No chats to open");
                         break;
                     }
                     int index = Main.Input_Int("Index");
-                    if(index<1 || index > chats.size()){
+                    if (index < 1 || index > chats.size()) {
                         System.out.println("Invalid Index");
-                    }else {
+                    } else {
                         Chat curr = chats.get(--index);
-                        if(curr instanceof DM_chat temp){
+                        if (curr instanceof DM_chat temp) {
                             DMChat_Page(temp);
-                        }else if (curr instanceof Group_chat temp ) {
+                        } else if (curr instanceof Group_chat temp) {
                             Group_Chat_Page(temp);
                         }
                     }
-                }case 2->{
+                }
+                case 2 -> {
                     String friendo = Chose_Friendo();
-                    if (friendo == null) break;
+                    if (friendo == null)
+                        break;
                     boolean found = false;
-                    if(!chats.isEmpty()){
-                        for(Chat chat: chats){
-                            if(chat instanceof DM_chat temp){
-                                if(temp.getR_username().equals(friendo)){
+                    if (!chats.isEmpty()) {
+                        for (Chat chat : chats) {
+                            if (chat instanceof DM_chat temp) {
+                                if (temp.getR_username().equals(friendo)) {
                                     found = true;
                                     DMChat_Page(temp);
                                     break;
                                 }
                             }
                         }
-                    }if(!found){
-                        DM_chat temp1  = new DM_chat(Main.current.getCredentials().getUsername(),friendo);
-                        DM_chat temp2 = new DM_chat(friendo,Main.current.getCredentials().getUsername());
-                        Database.WriteChat(Main.current.getCredentials().getUsername(),temp1);
-                        Database.WriteChat(friendo,temp2);
+                    }
+                    if (!found) {
+                        DM_chat temp1 = new DM_chat(Main.current.getCredentials().getUsername(), friendo);
+                        DM_chat temp2 = new DM_chat(friendo, Main.current.getCredentials().getUsername());
+                        Database.WriteChat(Main.current.getCredentials().getUsername(), temp1);
+                        Database.WriteChat(friendo, temp2);
                         DMChat_Page(temp1);
                     }
-                }case 3->{
+                }
+                case 3 -> {
                     Create_Group_Chat();
-                }case 0->{
+                }
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void DMChat_Page(DM_chat chat){
+    public static void DMChat_Page(DM_chat chat) {
 
         ArrayList<Message> messages = Database.Load_ALLMessages(chat.getFolder_path());
         ArrayList<Message> newMessages = new ArrayList<>();
         int previousSize = messages.size();
         String fullname = Main.Get_Fullname(chat.getR_username());
-        while (true){
+        while (true) {
             System.out.println("----------------------------------------------------");
-            System.out.println("    " + fullname+"    "+(Database.Check_Online(chat.getR_username())?  "Online 🟢": "Offline 🔴") );
+            System.out.println("    " + fullname + "    "
+                    + (Database.Check_Online(chat.getR_username()) ? "Online 🟢" : "Offline 🔴"));
             System.out.println("----------------------------------------------------");
             newMessages = Database.Load_New_Messages(chat.getFolder_path(), previousSize);
             if (!newMessages.isEmpty()) {
@@ -724,7 +775,7 @@ public class Page {
                 previousSize = messages.size();
             }
 
-            if(messages.isEmpty()) {
+            if (messages.isEmpty()) {
                 System.out.println("No Messages yet!");
             } else {
                 Main.Print_Entire_Chat(messages);
@@ -734,38 +785,38 @@ public class Page {
             System.out.println("        2- Refresh Messages");
             System.out.println("        0- Return to Inbox");
             System.out.println("__________________________________________");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     Database.WriteMessage(chat.getFolder_path(), Main.Input_Message());
-                    Database.Write_Notification(chat.getR_username(),Main.Input_NotificationM());
+                    Database.Write_Notification(chat.getR_username(), Main.Input_NotificationM());
                     System.out.println("Message sent!");
                 }
-                case 2->{
+                case 2 -> {
 
                 }
-                case 0->{
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static String Group_Members_Online(Group_chat chat){
-        int count =0;
-        for (String member: chat.getMembers()){
-            if(Database.Check_Online(member)){
+    public static String Group_Members_Online(Group_chat chat) {
+        int count = 0;
+        for (String member : chat.getMembers()) {
+            if (Database.Check_Online(member)) {
                 count++;
             }
         }
-        return "Members Online "+ count;
+        return "Members Online " + count;
     }
 
-    public static void Group_Chat_Page(Group_chat chat){
+    public static void Group_Chat_Page(Group_chat chat) {
         boolean Admin = Main.current.getCredentials().getUsername().equals(chat.getCreator());
         ArrayList<Message> messages = Database.Load_ALLMessages(chat.getFolder_path());
         int previousSize = messages.size();
 
-        while (true){
+        while (true) {
             ArrayList<Message> newMessages = Database.Load_New_Messages(chat.getFolder_path(), previousSize);
             if (!newMessages.isEmpty()) {
                 messages.addAll(newMessages);
@@ -774,10 +825,10 @@ public class Page {
 
             System.out.println("----------------------------------------------------");
             System.out.println("          " + chat.getGroupname());
-            System.out.println( "         "+ Group_Members_Online(chat));
+            System.out.println("         " + Group_Members_Online(chat));
             System.out.println("----------------------------------------------------");
 
-            if(messages.isEmpty()) {
+            if (messages.isEmpty()) {
                 System.out.println("No Messages yet!");
             } else {
                 Main.Print_Entire_Chat(messages);
@@ -790,55 +841,57 @@ public class Page {
             System.out.println("       5- Delete/Exit Group");
             System.out.println("       0- Return to Inbox");
             System.out.println("----------------------------------------------------");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     Message newMessage = Main.Input_Message();
                     Database.WriteMessage(chat.getFolder_path(), newMessage);
-                    for(String m : chat.getMembers()){
-                        Database.Write_Notification(m,Main.Input_NotificationM());
+                    for (String m : chat.getMembers()) {
+                        Database.Write_Notification(m, Main.Input_NotificationM());
                     }
                     System.out.println("Message sent!");
                 }
-                case 2->{
+                case 2 -> {
 
-                }case 3->{
+                }
+                case 3 -> {
                     Manage_Members(chat);
                 }
-                case 4->{
-                    if(Admin){
+                case 4 -> {
+                    if (Admin) {
                         chat.setGroupdescription(Main.Input_String("New Description: "));
-                    }else{
+                    } else {
                         System.out.println("You are not the admin");
                     }
-                }case 5->{
-                    if(!Admin){
+                }
+                case 5 -> {
+                    if (!Admin) {
                         chat.removeMember(Main.current.getCredentials().getUsername());
                         Database.Delete_Chat(chat.getFolder_path());
                         System.out.println("Group Deleted!");
                         return;
-                    }else {
+                    } else {
                         System.out.println("You must appoint someone else as admin first! ");
                     }
                 }
-                case 0->{
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void Manage_Members(Group_chat chat){
+    public static void Manage_Members(Group_chat chat) {
         boolean Admin = Main.current.getCredentials().getUsername().equals(chat.getCreator());
-        while (true){
+        while (true) {
             System.out.println("=========================================");
-            System.out.println("          "+chat.getGroupname());
+            System.out.println("          " + chat.getGroupname());
             System.out.println("=========================================");
             System.out.println("Group Description: ");
             System.out.println(chat.getGroupdescription());
             System.out.println("=========================================");
-            for(int i = 0; i < chat.getMembers().size(); i++){
-                String display = (i+1) + "- " + Main.Get_Fullname(chat.getMembers().get(i));
-                if(chat.getMembers().get(i).equals(chat.getCreator())){
+            for (int i = 0; i < chat.getMembers().size(); i++) {
+                String display = (i + 1) + "- " + Main.Get_Fullname(chat.getMembers().get(i));
+                if (chat.getMembers().get(i).equals(chat.getCreator())) {
                     display += " (ADMIN)";
                 }
                 System.out.println(display);
@@ -849,69 +902,73 @@ public class Page {
             System.out.println("3- Make Admin");
             System.out.println("0- Back");
             System.out.println("=========================================");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
-                    if(Admin){
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
+                    if (Admin) {
                         String user = Chose_Friendo();
-                        if(user!=null){
+                        if (user != null) {
                             chat.getMembers().add(user);
                             System.out.println("Member Added Successfully!");
                         }
-                    }else{
+                    } else {
                         System.out.println("You are not the admin");
                     }
-                }case 2->{
-                    if(Admin){
+                }
+                case 2 -> {
+                    if (Admin) {
                         int index = Main.Input_Int("Index:");
-                        if(index<1 || index>chat.getMembers().size()){
+                        if (index < 1 || index > chat.getMembers().size()) {
                             index--;
                             String curr = chat.getMembers().get(index);
-                            if(curr.equals(chat.getCreator())){
+                            if (curr.equals(chat.getCreator())) {
                                 System.out.println("Can't Remove Yourself!");
                                 continue;
                             }
                             chat.getMembers().remove(index);
                             System.out.println("Member Removed Successfully!");
                         }
-                    }else{
+                    } else {
                         System.out.println("You are not the admin");
                     }
-                }case 3->{
-                    if(Admin){
-                        if(Main.Yes_or_No("Make some else admin, You wont be admin anymore")){
+                }
+                case 3 -> {
+                    if (Admin) {
+                        if (Main.Yes_or_No("Make some else admin, You wont be admin anymore")) {
                             int index = Main.Input_Int("Index:");
-                            if(index<1 || index>chat.getMembers().size()){
+                            if (index < 1 || index > chat.getMembers().size()) {
                                 index--;
                                 String curr = chat.getMembers().get(index);
-                                if(curr.equals(chat.getCreator())){
+                                if (curr.equals(chat.getCreator())) {
                                     System.out.println("You are already admin");
                                     continue;
                                 }
                                 chat.setCreator(curr);
-                                System.out.println(Main.Get_Fullname(curr)+ " is now an Admin!");
+                                System.out.println(Main.Get_Fullname(curr) + " is now an Admin!");
                             }
                         }
                     }
-                }case 0->{
+                }
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void Notifications_Page(){
+    public static void Notifications_Page() {
         Database.Compute_Read_Unread();
         ArrayList<Notification> read;
         ArrayList<Notification> unread;
-        while(true){
+        while (true) {
             read = Database.Load_Read_Notifications();
             unread = Database.Load_Unread_Notification();
             int Unread = unread.size();
             System.out.println("=========================================");
-            System.out.println("            NOTIFICATIONS " + (Unread> 0 ? (Unread+"new"):"No new Messages"));
+            System.out.println("            NOTIFICATIONS " + (Unread > 0 ? (Unread + "new") : "No new Messages"));
             System.out.println("=========================================");
-            if(unread.isEmpty() && read.isEmpty()) System.out.println("No notifications Yet!");
-            else{
+            if (unread.isEmpty() && read.isEmpty())
+                System.out.println("No notifications Yet!");
+            else {
                 Main.Print_Notifications(unread);
                 Main.Print_Notifications(read);
             }
@@ -920,27 +977,29 @@ public class Page {
             System.out.println("          2- Clear all");
             System.out.println("          0- Back");
             System.out.println("=========================================");
-            switch(Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     Database.Mark_All_Notifications_Read();
                     Database.Compute_Read_Unread();
                     System.out.println("Marked as read.");
-                }case 2->{
+                }
+                case 2 -> {
                     Database.Delete_Notifications();
                     System.out.println("Cleared notifications.");
-                }case 0->{
+                }
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void home_page(){
-        while (Main.current!=null){
+    public static void home_page() {
+        while (Main.current != null) {
             Database.Compute_Read_Unread();
             int invites = Database.Load_Game_InvitesSize();
             int Unread = Database.Load_Unread_Notification().size();
-            System.out.println("Logged in as: "+Main.current.getCredentials().getUsername());
+            System.out.println("Logged in as: " + Main.current.getCredentials().getUsername());
             System.out.println("__________________________________________");
             System.out.println("           FACEBOOK HOME PAGE");
             System.out.println("__________________________________________");
@@ -949,33 +1008,42 @@ public class Page {
             System.out.println("            3- Find Friends");
             System.out.println("            4- View Feed");
             System.out.println("            5- Create Post");
-            System.out.println("            6- Notifications" + (Unread > 0 ? " ("+Unread+" new)" : ""));
-            System.out.println("            7- Facebook Games  "+ ((invites>0)? "("+ invites+")" : ""));
+            System.out.println("            6- Notifications" + (Unread > 0 ? " (" + Unread + " new)" : ""));
+            System.out.println("            7- Facebook Games  " + ((invites > 0) ? "(" + invites + ")" : ""));
             System.out.println("            8- Settings");
             System.out.println("            9- Refresh Page");
             System.out.println("------------------------------------------");
             System.out.println("            0- Logout");
             System.out.println("__________________________________________");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     profile_page();
-                }case 2->{
+                }
+                case 2 -> {
                     Inbox_page();
-                }case 3->{
+                }
+                case 3 -> {
                     Find_Friends();
-                }case 4->{
+                }
+                case 4 -> {
                     View_Feed();
-                }case 5->{
+                }
+                case 5 -> {
                     Main.Input_Post();
-                }case 6->{
+                }
+                case 6 -> {
                     Notifications_Page();
-                }case 7->{
+                }
+                case 7 -> {
                     Games_Page();
-                }case 8->{
+                }
+                case 8 -> {
                     Settings_Page();
-                }case 9->{
+                }
+                case 9 -> {
                     System.out.println("Refreshing...");
-                }case 0->{
+                }
+                case 0 -> {
                     Database.Delete_Online();
                     System.out.println("\t\t\t\tLOGGING OUT");
                     return;
@@ -984,9 +1052,10 @@ public class Page {
         }
     }
 
-    public static void View_Feed(){
-        ArrayList<Post> feeds = Database.Load_Feed();;
-        while (true){
+    public static void View_Feed() {
+        ArrayList<Post> feeds = Database.Load_Feed();
+        ;
+        while (true) {
             System.out.println("=========================================");
             System.out.println("                 FEED");
             System.out.println("=========================================");
@@ -996,54 +1065,58 @@ public class Page {
             System.out.println("        2- Refresh feed");
             System.out.println("        0- Return to homePage");
             System.out.println("=========================================");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     int index = Main.Input_Int("Index");
-                    if(index<1||index> feeds.size()){
+                    if (index < 1 || index > feeds.size()) {
                         System.out.println("Invalid Index");
-                    }else{
+                    } else {
                         View_Post_Details(feeds.get(--index));
                     }
-                }case 2->{
+                }
+                case 2 -> {
                     ArrayList<Post> newfeed = Database.Load_Feed();
-                    if(newfeed.size()>feeds.size()){
+                    if (newfeed.size() > feeds.size()) {
                         System.out.println("Feed Refreshed");
                         feeds = newfeed;
-                    }else{
+                    } else {
                         System.out.println("No new Feed yet!");
                     }
-                }case 0->{
+                }
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void Games_Page(){
-        while (true){
+    public static void Games_Page() {
+        while (true) {
             ArrayList<Game_Invite> invites = Database.Load_Game_Invites();
             System.out.println("================================");
             System.out.println("         Facebook Games");
             System.out.println("================================");
             System.out.println("1- Play Games");
-            System.out.println("2- Manage Game Invites "+ ((invites.size()>0)? "("+ (invites.size())+")" : ""));
+            System.out.println("2- Manage Game Invites " + ((invites.size() > 0) ? "(" + (invites.size()) + ")" : ""));
             System.out.println("0- Return");
             System.out.println("================================");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     Play_Games_Page();
-                }case 2->{
+                }
+                case 2 -> {
                     Manage_Game_Invites();
-                }case 0->{
+                }
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void Play_Games_Page(){
+    public static void Play_Games_Page() {
         ArrayList<Game> games = Main.Get_ALL_games();
-        while (true){
+        while (true) {
             System.out.println("================================");
             System.out.println("            GAMES");
             System.out.println("================================");
@@ -1051,24 +1124,25 @@ public class Page {
             System.out.println("================================");
             System.out.println("1- Chose Game");
             System.out.println("0- Return");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     int index = Main.Input_Int("Index");
-                    if(index< 1 || index > games.size()){
+                    if (index < 1 || index > games.size()) {
                         System.out.println("Invalid Index");
-                    }else{
+                    } else {
                         Game game = games.get(--index);
                         game.Game_launch();
                     }
-                }case 0->{
+                }
+                case 0 -> {
                     return;
                 }
             }
         }
     }
 
-    public static void Manage_Game_Invites(){
-        while(true){
+    public static void Manage_Game_Invites() {
+        while (true) {
             ArrayList<Game_Invite> invites = Database.Load_Game_Invites();
             System.out.println("================================");
             System.out.println("          GAME INVITES");
@@ -1079,29 +1153,31 @@ public class Page {
             System.out.println("2- Delete Game Invite");
             System.out.println("0- Return");
             System.out.println("================================");
-            switch (Main.Input_Int("Choice")){
-                case 1->{
+            switch (Main.Input_Int("Choice")) {
+                case 1 -> {
                     int index = Main.Input_Int("Index");
-                    if(index< 1 || index > invites.size()){
+                    if (index < 1 || index > invites.size()) {
                         System.out.println("Invalid Index");
-                    }else{
+                    } else {
                         Game_Invite invite = invites.get(--index);
                         Database.Delete_Game_invite(invite);
-                        if(invite.getGame() instanceof TicTacToe toe){
+                        if (invite.getGame() instanceof TicTacToe toe) {
                             toe.Online_game_launch(invite.getFilepath());
                         } else if (invite.getGame() instanceof Hangman hangman) {
-                            hangman.online_game_launch(invite.getFilepath());
+                            hangman.Online_game_launch(invite.getFilepath());
                         }
                     }
-                }case 2->{
+                }
+                case 2 -> {
                     int index = Main.Input_Int("Index");
-                    if(index< 1 || index > invites.size()){
+                    if (index < 1 || index > invites.size()) {
                         System.out.println("Invalid Index");
-                    }else{
+                    } else {
                         Game_Invite invite = invites.get(--index);
                         Database.Delete_Game_invite(invite);
                     }
-                }case 0->{
+                }
+                case 0 -> {
                     return;
                 }
             }
