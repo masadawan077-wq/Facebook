@@ -1080,7 +1080,11 @@ public class Hangman extends Game implements Serializable {
             // But we must respect that order.
 
             String title = "Hangman Online - " + (amIGuesser ? "GUESSING" : "SPECTATING");
+            if (frame == null) {
+                setupFrame(title);
+            }
             showGameScreen(title, true);
+            frame.setVisible(true);
 
             // Start Loop
             if (onlineTimer != null)
