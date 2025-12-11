@@ -53,11 +53,17 @@ public class GamesDialog extends JDialog {
         addMouseMotionListener(ma);
     }
 
+    private JPanel contentPanel;
+    private String currentTab = "Games";
+    private JPanel tabsPanel;
+
+    // ... (Constructor remains same)
+
     private void initComponents() {
         RoundedPanel mainPanel = new RoundedPanel(15);
-        mainPanel.setLayout(new BorderLayout(0, 20));
+        mainPanel.setLayout(new BorderLayout(0, 10));
         mainPanel.setBackground(Color.WHITE);
-        mainPanel.setBorder(new EmptyBorder(25, 25, 25, 25));
+        mainPanel.setBorder(new EmptyBorder(15, 25, 25, 25));
 
         // Header with Close
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -72,14 +78,7 @@ public class GamesDialog extends JDialog {
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         titleLabel.setForeground(FacebookGUI.FB_TEXT_PRIMARY);
 
-        // Description
-        JLabel descLabel = new JLabel("Choose a game to play with your friends!");
-        descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-        descLabel.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
-
         titlePanel.add(titleLabel);
-        titlePanel.add(Box.createVerticalStrut(8));
-        titlePanel.add(descLabel);
 
         // Close Button
         JLabel closeBtn = new JLabel("✕");
@@ -107,31 +106,175 @@ public class GamesDialog extends JDialog {
         headerPanel.add(titlePanel, BorderLayout.CENTER);
         headerPanel.add(closePanel, BorderLayout.EAST);
 
-        // Games list
-        JPanel gamesPanel = new JPanel();
-        gamesPanel.setLayout(new BoxLayout(gamesPanel, BoxLayout.Y_AXIS));
-        gamesPanel.setBackground(Color.WHITE);
+        // Tabs
+        tabsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        tabsPanel.setBackground(Color.WHITE);
 
-        for (int i = 0; i < games.size(); i++) {
-            Game game = games.get(i);
-            JPanel gameCard = createGameCard(game);
-            gamesPanel.add(gameCard);
-            if (i < games.size() - 1) {
-                gamesPanel.add(Box.createVerticalStrut(15));
-            }
-        }
+        tabsPanel.add(createTabButton("Games"));
+        tabsPanel.add(createTabButton("Invites"));
 
-        JScrollPane scrollPane = new JScrollPane(gamesPanel);
+        JPanel topSection = new JPanel(new BorderLayout(0, 10));
+        topSection.setBackground(Color.WHITE);
+        topSection.add(headerPanel, BorderLayout.NORTH);
+        topSection.add(tabsPanel, BorderLayout.CENTER);
+
+        // Content
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBackground(Color.WHITE);
+
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
-        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        mainPanel.add(topSection, BorderLayout.NORTH);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
         add(mainPanel);
+
+        showGames(); // Default view
+    }
+
+    private JButton createTabButton(String name) {
+        JButton btn = new JButton(name);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        if (name.equals(currentTab)) {
+            btn.setForeground(FacebookGUI.FB_BLUE);
+            btn.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, FacebookGUI.FB_BLUE));
+        } else {
+            btn.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
+            btn.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
+        }
+
+        btn.addActionListener(e -> {
+            currentTab = name;
+            updateTabs();
+            if (name.equals("Games"))
+                showGames();
+            else
+                showInvites();
+        });
+        return btn;
+    }
+
+    private void updateTabs() {
+        for (Component c : tabsPanel.getComponents()) {
+            if (c instanceof JButton) {
+                JButton b = (JButton) c;
+                if (b.getText().equals(currentTab)) {
+                    b.setForeground(FacebookGUI.FB_BLUE);
+                    b.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, FacebookGUI.FB_BLUE));
+                } else {
+                    b.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
+                    b.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
+                }
+            }
+        }
+    }
+
+    private void showGames() {
+        contentPanel.removeAll();
+        for (int i = 0; i < games.size(); i++) {
+            Game game = games.get(i);
+            JPanel gameCard = createGameCard(game);
+            contentPanel.add(gameCard);
+            if (i < games.size() - 1) {
+                contentPanel.add(Box.createVerticalStrut(15));
+            }
+        }
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    private void showInvites() {
+        contentPanel.removeAll();
+        ArrayList<com.facebook.Game_Invite> invites = com.facebook.Database.Load_Game_Invites();
+
+        if (invites.isEmpty()) {
+            JLabel empty = new JLabel("No game invites pending.");
+            empty.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+            empty.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
+            empty.setAlignmentX(Component.CENTER_ALIGNMENT);
+            contentPanel.add(Box.createVerticalStrut(50));
+            contentPanel.add(empty);
+        } else {
+            for (com.facebook.Game_Invite invite : invites) {
+                contentPanel.add(createInviteCard(invite));
+                contentPanel.add(Box.createVerticalStrut(10));
+            }
+        }
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    private JPanel createInviteCard(com.facebook.Game_Invite invite) {
+        RoundedPanel card = new RoundedPanel(10);
+        card.setBackground(new Color(248, 249, 250));
+        card.setLayout(new BorderLayout(15, 0));
+        card.setBorder(new EmptyBorder(15, 15, 15, 15));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 90));
+
+        // Icon
+        JLabel icon = new JLabel(getGameIcon(invite.getGame()));
+        icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 32));
+
+        // Info
+        JPanel info = new JPanel(new GridLayout(2, 1));
+        info.setOpaque(false);
+        info.add(new JLabel("Game Invite: " + invite.getGame()));
+
+        com.facebook.User sender = com.facebook.Database.LoadUser(invite.getSender()); // Need to get sender
+        // Note: invite.getSender() needs to work.
+        String senderName = (sender != null) ? sender.getFullName() : invite.getSender();
+
+        JLabel sub = new JLabel("From: " + senderName);
+        sub.setForeground(Color.GRAY);
+        info.add(sub);
+
+        // Actions
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        actions.setOpaque(false);
+
+        AnimatedButton accept = new AnimatedButton("Accept", FacebookGUI.FB_GREEN, FacebookGUI.FB_GREEN_HOVER);
+        accept.setPreferredSize(new Dimension(80, 30));
+        accept.addActionListener(e -> {
+            // Logic to launch game
+            com.facebook.Database.Delete_Game_invite(invite);
+            // Launch logic - need Game object.
+            // We have game name. Loop through games list to find match
+            for (Game g : games) {
+                if (g.getName().equalsIgnoreCase(invite.getGame())) {
+                    launchGame(g);
+                    break;
+                }
+            }
+        });
+
+        AnimatedButton decline = new AnimatedButton("Decline", new Color(228, 230, 235), new Color(210, 213, 218));
+        decline.setForeground(Color.BLACK);
+        decline.setPreferredSize(new Dimension(80, 30));
+        decline.addActionListener(e -> {
+            com.facebook.Database.Delete_Game_invite(invite);
+            showInvites();
+        });
+
+        actions.add(accept);
+        actions.add(decline);
+
+        card.add(icon, BorderLayout.WEST);
+        card.add(info, BorderLayout.CENTER);
+        card.add(actions, BorderLayout.EAST);
+
+        return card;
     }
 
     private JPanel createGameCard(Game game) {
+        // ... (Existing implementation, no changes needed inside)
         RoundedPanel card = new RoundedPanel(12);
         card.setBackground(new Color(248, 249, 250));
         card.setLayout(new BorderLayout(15, 0));

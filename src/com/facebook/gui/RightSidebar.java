@@ -16,11 +16,13 @@ import java.util.ArrayList;
  */
 public class RightSidebar extends JPanel {
 
+    private FacebookGUI parent;
     private HomePage homePage;
     private JPanel friendsListPanel;
     private JPanel groupChatsPanel;
 
     public RightSidebar(FacebookGUI parent, HomePage homePage) {
+        this.parent = parent;
         this.homePage = homePage;
         setBackground(Color.WHITE);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -298,11 +300,109 @@ public class RightSidebar extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                // TODO: Open group chat
+                homePage.openChatWithGroup(groupChat);
             }
         });
 
         return panel;
+    }
+
+    private void showCreateGroupDialog() {
+        JDialog dialog = new JDialog(parent, "Create Group Chat", true);
+        dialog.setSize(400, 500);
+        dialog.setLocationRelativeTo(parent);
+
+        JPanel panel = new JPanel(new BorderLayout(0, 15));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        // Header
+        JLabel title = new JLabel("Create Group");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 22));
+
+        // Name & Description
+        JPanel fieldsPanel = new JPanel(new GridLayout(2, 1, 0, 10));
+        fieldsPanel.setBackground(Color.WHITE);
+
+        com.facebook.gui.components.ModernTextField nameField = new com.facebook.gui.components.ModernTextField(
+                "Group Name");
+        com.facebook.gui.components.ModernTextField descField = new com.facebook.gui.components.ModernTextField(
+                "Description");
+
+        fieldsPanel.add(nameField);
+        fieldsPanel.add(descField);
+
+        // Friend Selector
+        JPanel friendsList = new JPanel();
+        friendsList.setLayout(new BoxLayout(friendsList, BoxLayout.Y_AXIS));
+        friendsList.setBackground(Color.WHITE);
+
+        ArrayList<String> selectedFriends = new ArrayList<>();
+        ArrayList<String> myFriends = Database.Load_Friends(Main.current.getCredentials().getUsername());
+
+        for (String f : myFriends) {
+            JCheckBox cb = new JCheckBox(Database.LoadUser(f).getFullName());
+            cb.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+            cb.setBackground(Color.WHITE);
+            cb.setFocusPainted(false);
+            cb.addItemListener(e -> {
+                if (cb.isSelected())
+                    selectedFriends.add(f);
+                else
+                    selectedFriends.remove(f);
+            });
+            friendsList.add(cb);
+        }
+
+        JScrollPane scroll = new JScrollPane(friendsList);
+        scroll.setBorder(BorderFactory.createTitledBorder("Add Members"));
+        scroll.setBackground(Color.WHITE);
+
+        // Create Button
+        com.facebook.gui.components.AnimatedButton createBtn = new com.facebook.gui.components.AnimatedButton(
+                "Create Group", FacebookGUI.FB_BLUE, FacebookGUI.FB_BLUE_HOVER);
+        createBtn.setPreferredSize(new Dimension(0, 45));
+        createBtn.addActionListener(e -> {
+            String gName = nameField.getText().trim();
+            String gDesc = descField.getText().trim();
+
+            if (gName.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Group name is required!");
+                return;
+            }
+            if (selectedFriends.size() < 1) { // Min 2 ppl (me + 1)
+                JOptionPane.showMessageDialog(dialog, "Select at least 1 friend.");
+                return;
+            }
+
+            // Logic from CLI Page.Create_Group_Chat
+            ArrayList<String> members = new ArrayList<>(selectedFriends);
+            members.add(Main.current.getCredentials().getUsername()); // Add self
+
+            com.facebook.Group_chat newGroup = new com.facebook.Group_chat(gName, gDesc, members);
+
+            // distribute to all members
+            for (String m : members) {
+                Database.WriteChat(m, newGroup);
+            }
+
+            JOptionPane.showMessageDialog(dialog, "Group Created!");
+            dialog.dispose();
+            refresh(); // Reload sidebar
+        });
+
+        panel.add(title, BorderLayout.NORTH);
+
+        JPanel centerWrapper = new JPanel(new BorderLayout(0, 10));
+        centerWrapper.setBackground(Color.WHITE);
+        centerWrapper.add(fieldsPanel, BorderLayout.NORTH);
+        centerWrapper.add(scroll, BorderLayout.CENTER);
+
+        panel.add(centerWrapper, BorderLayout.CENTER);
+        panel.add(createBtn, BorderLayout.SOUTH);
+
+        dialog.add(panel);
+        dialog.setVisible(true);
     }
 
     private JPanel createCreateGroupChatButton() {
@@ -337,7 +437,7 @@ public class RightSidebar extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                // TODO: Create group chat dialog
+                showCreateGroupDialog();
             }
         });
 
@@ -349,37 +449,4 @@ public class RightSidebar extends JPanel {
         loadGroupChats();
     }
 
-    private JPanel createAdItem(String impPath, String title, String url) {
-        JPanel panel = new JPanel(new BorderLayout(10, 0));
-        panel.setBackground(Color.WHITE);
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
-        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        // Placeholder for ad image
-        JPanel imgPlaceholder = new JPanel();
-        imgPlaceholder.setPreferredSize(new Dimension(100, 100));
-        imgPlaceholder.setBackground(new Color(240, 242, 245));
-        imgPlaceholder.setBorder(new javax.swing.border.LineBorder(new Color(230, 230, 230), 1));
-
-        JPanel textPanel = new JPanel();
-        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-        textPanel.setBackground(Color.WHITE);
-
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 15));
-
-        JLabel urlLabel = new JLabel(url);
-        urlLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        urlLabel.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
-
-        textPanel.add(Box.createVerticalGlue());
-        textPanel.add(titleLabel);
-        textPanel.add(urlLabel);
-        textPanel.add(Box.createVerticalGlue());
-
-        panel.add(imgPlaceholder, BorderLayout.WEST);
-        panel.add(textPanel, BorderLayout.CENTER);
-
-        return panel;
-    }
 }

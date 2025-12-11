@@ -92,4 +92,8 @@ public class User implements Serializable {
         return Privacy;
     }
 
+    public Gender getGender() {
+        return gender;
+    }
+
 }

@@ -596,6 +596,18 @@ public class Database {
         WriteFriendinFriend(username);
     }
 
+    public static void RemoveFriend(String username) {
+        File folder = new File(Friendsfolder, Main.current.getCredentials().getUsername());
+        File file = new File(folder, username);
+        if (file.exists())
+            file.delete();
+
+        File folder2 = new File(Friendsfolder, username);
+        File file2 = new File(folder2, Main.current.getCredentials().getUsername());
+        if (file2.exists())
+            file2.delete();
+    }
+
     public static void WriteFriendinFriend(String username) {
         File folder = new File(Friendsfolder, username);
 

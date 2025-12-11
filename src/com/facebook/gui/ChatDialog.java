@@ -258,18 +258,41 @@ public class ChatDialog extends JDialog {
 
         JPanel container = new JPanel(new FlowLayout(isSentByMe ? FlowLayout.RIGHT : FlowLayout.LEFT, 0, 0));
         container.setOpaque(false);
-        container.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+        container.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1000)); // Allow dynamic height
 
-        JPanel bubble = new JPanel();
-        bubble.setLayout(new BoxLayout(bubble, BoxLayout.Y_AXIS));
+        RoundedPanel bubble = new RoundedPanel(18, false); // No shadow for chat bubbles
         bubble.setBackground(isSentByMe ? FacebookGUI.FB_BLUE : new Color(240, 242, 245));
         bubble.setBorder(new EmptyBorder(10, 15, 10, 15));
+        bubble.setLayout(new BorderLayout());
 
-        JLabel messageLabel = new JLabel("<html><div style='width: 250px;'>" + msg.getContent() + "</div></html>");
-        messageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        messageLabel.setForeground(isSentByMe ? Color.WHITE : FacebookGUI.FB_TEXT_PRIMARY);
+        JTextArea messageArea = new JTextArea(msg.getContent());
+        messageArea.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        messageArea.setForeground(isSentByMe ? Color.WHITE : FacebookGUI.FB_TEXT_PRIMARY);
+        messageArea.setWrapStyleWord(true);
+        messageArea.setLineWrap(true);
+        messageArea.setOpaque(false);
+        messageArea.setEditable(false);
+        messageArea.setFocusable(false);
 
-        bubble.add(messageLabel);
+        // Calculate size ensuring it doesn't get too wide or too narrow
+        int maxWidth = 280;
+        FontMetrics fm = messageArea.getFontMetrics(messageArea.getFont());
+        int textWidth = fm.stringWidth(msg.getContent()) + 30; // buffer
+
+        int preferredWidth = Math.min(Math.max(textWidth, 50), maxWidth);
+        // We need to set columns/size to force wrapping at maxWidth if needed
+        messageArea.setSize(new Dimension(preferredWidth, Short.MAX_VALUE));
+
+        // This is a bit hacky in Swing without proper layout manager tweaking
+        // but let's try setting preferred size on the JTextArea
+        // If content is long, we cap width, height grows.
+        // If content is short, width is small.
+
+        if (textWidth > maxWidth) {
+            messageArea.setColumns(25); // Approx chars for 280px
+        }
+
+        bubble.add(messageArea, BorderLayout.CENTER);
 
         container.add(bubble);
         return container;

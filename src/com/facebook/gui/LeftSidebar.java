@@ -25,13 +25,19 @@ public class LeftSidebar extends JPanel {
     }
 
     private void initComponents() {
+        // Home (Top Priority)
+        add(createMenuItem("🏠", "Home", e -> homePage.showFeedPanel()));
+
         // User profile
         add(createMenuItem(
                 createProfileIcon(Main.current.getFirstname()),
                 Main.current.getFirstname() + " " + Main.current.getLastname(),
                 e -> {
-                    // TODO: Navigate to profile
+                    homePage.showProfilePanel();
                 }));
+
+        // My Profile (Explicit Link)
+        add(createMenuItem("👤", "My Profile", e -> homePage.showProfilePanel()));
 
         // Friends
         add(createMenuItem("👥", "Friends", e -> homePage.showFriendsPanel()));
@@ -43,15 +49,15 @@ public class LeftSidebar extends JPanel {
         add(createMenuItem("👨‍👩‍👧‍👦", "Groups", e -> {
         }));
 
-        // Feeds
-        add(createMenuItem("📰", "Feeds", e -> homePage.showFeedPanel()));
-
         // Saved
         add(createMenuItem("🔖", "Saved", e -> {
         }));
 
         // Games (Replaces 8 ball pool and others)
         add(createMenuItem("🎮", "Games", e -> homePage.openGamesDialog()));
+
+        // Settings
+        add(createMenuItem("⚙️", "Settings", e -> homePage.showSettingsPanel()));
 
         add(Box.createVerticalGlue());
     }

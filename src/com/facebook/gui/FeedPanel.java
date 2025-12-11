@@ -323,6 +323,61 @@ public class FeedPanel extends JPanel {
         privacyPanel.add(new JLabel("Who can see this? "));
         privacyPanel.add(privacyCombo);
 
+        // Tagging Button
+        ArrayList<String> taggedFriends = new ArrayList<>();
+        JLabel taggedLabel = new JLabel("");
+        taggedLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        taggedLabel.setForeground(FacebookGUI.FB_BLUE);
+
+        JButton tagBtn = new JButton("🏷️ Tag Friends");
+        tagBtn.setContentAreaFilled(false);
+        tagBtn.setBorderPainted(false);
+        tagBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        tagBtn.addActionListener(e -> {
+            // Simple multi-select dialog
+            JDialog tagDialog = new JDialog(parent, "Tag Friends", true);
+            tagDialog.setSize(300, 400);
+            tagDialog.setLocationRelativeTo(dialog);
+
+            JPanel tagList = new JPanel();
+            tagList.setLayout(new BoxLayout(tagList, BoxLayout.Y_AXIS));
+            tagList.setBackground(Color.WHITE);
+
+            ArrayList<String> myFriends = Database.Load_Friends(Main.current.getCredentials().getUsername());
+            for (String f : myFriends) {
+                JCheckBox cb = new JCheckBox(Database.LoadUser(f).getFullName());
+                cb.setBackground(Color.WHITE);
+                if (taggedFriends.contains(f))
+                    cb.setSelected(true);
+
+                cb.addItemListener(ev -> {
+                    if (cb.isSelected()) {
+                        if (!taggedFriends.contains(f))
+                            taggedFriends.add(f);
+                    } else {
+                        taggedFriends.remove(f);
+                    }
+                });
+                tagList.add(cb);
+            }
+
+            JScrollPane tsp = new JScrollPane(tagList);
+
+            com.facebook.gui.components.AnimatedButton doneBtn = new com.facebook.gui.components.AnimatedButton("Done",
+                    FacebookGUI.FB_BLUE, FacebookGUI.FB_BLUE_HOVER);
+            doneBtn.addActionListener(ev -> {
+                tagDialog.dispose();
+                taggedLabel.setText("Tagged: " + taggedFriends.size() + " friends");
+            });
+
+            tagDialog.add(tsp, BorderLayout.CENTER);
+            tagDialog.add(doneBtn, BorderLayout.SOUTH);
+            tagDialog.setVisible(true);
+        });
+
+        privacyPanel.add(tagBtn);
+        privacyPanel.add(taggedLabel);
+
         JScrollPane scrollPane = new JScrollPane(contentArea);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(219, 223, 231)));
 
@@ -350,6 +405,21 @@ public class FeedPanel extends JPanel {
 
                 // Add to feeds
                 Main.Add_in_Feed(recipients, path, newPost, false);
+
+                // Handle tagged friends separately - logic from Main.Input_Post
+                if (!taggedFriends.isEmpty()) {
+                    newPost.setTagged(taggedFriends);
+                    // Re-save post with tag info if needed, or Main.Add_in_Feed handles generic
+                    // logic?
+                    // Database.Write_Post already called, but object updated in memory.
+                    // Ideally modify Main.Add_in_Feed to handle notifications logic correctly or do
+                    // it manually here.
+                    // Main.Add_in_Feed(taggedFriends, path, newPost, true); // true = tagged
+                    for (String f : taggedFriends) {
+                        Database.WriteFeed(path, f, newPost);
+                        Database.Write_Notification(f, Main.Input_NotificationT());
+                    }
+                }
 
                 dialog.dispose();
                 refreshFeed();

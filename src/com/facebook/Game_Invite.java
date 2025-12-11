@@ -23,6 +23,10 @@ public class Game_Invite implements Serializable {
         return filepath;
     }
 
+    public String getSender() {
+        return sender;
+    }
+
     public void Print_Invite() {
 
         System.out.println("Invite from: " + Main.Get_Fullname(sender));

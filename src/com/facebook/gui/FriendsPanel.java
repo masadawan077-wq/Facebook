@@ -3,12 +3,13 @@ package com.facebook.gui;
 import com.facebook.Database;
 import com.facebook.Main;
 import com.facebook.User;
+import com.facebook.Message;
 import com.facebook.gui.components.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class FriendsPanel extends JPanel {
 
         // Header
         JLabel title = new JLabel("Friends");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 28)); // Bigger title
+        title.setFont(new Font("Segoe UI", Font.BOLD, 28));
         title.setForeground(FacebookGUI.FB_TEXT_PRIMARY);
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -49,7 +50,9 @@ public class FriendsPanel extends JPanel {
         tabsPanel.add(createTabButton("Chats"));
         tabsPanel.add(createTabButton("All Friends"));
         tabsPanel.add(createTabButton("Requests"));
+        tabsPanel.add(createTabButton("Sent"));
         tabsPanel.add(createTabButton("Find Friends"));
+        tabsPanel.add(createTabButton("Suggestions"));
 
         topPanel.add(title);
         topPanel.add(tabsPanel);
@@ -63,6 +66,24 @@ public class FriendsPanel extends JPanel {
         contentPanel.setBorder(new EmptyBorder(0, 20, 20, 20));
 
         add(new JScrollPane(contentPanel), BorderLayout.CENTER);
+    }
+
+    private void updateTabs(String activeName) {
+        currentTab = activeName;
+        for (Component c : tabsPanel.getComponents()) {
+            if (c instanceof JButton) {
+                JButton b = (JButton) c;
+                if (b.getText().equals(activeName)) {
+                    b.setForeground(FacebookGUI.FB_BLUE);
+                    b.setBackground(new Color(235, 245, 255));
+                    b.setOpaque(true);
+                } else {
+                    b.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
+                    b.setOpaque(false);
+                }
+            }
+        }
+        tabsPanel.repaint();
     }
 
     private JButton createTabButton(String name) {
@@ -88,82 +109,29 @@ public class FriendsPanel extends JPanel {
                 case "Chats" -> showChats();
                 case "All Friends" -> showAllFriends();
                 case "Requests" -> showRequests();
+                case "Sent" -> showSentRequests();
                 case "Find Friends" -> showFindFriends();
+                case "Suggestions" -> showSuggestions();
             }
         });
         return btn;
     }
 
-    private void updateTabs(String activeName) {
-        currentTab = activeName;
-        for (Component c : tabsPanel.getComponents()) {
-            if (c instanceof JButton) {
-                JButton b = (JButton) c;
-                if (b.getText().equals(activeName)) {
-                    b.setForeground(FacebookGUI.FB_BLUE);
-                    b.setBackground(new Color(235, 245, 255));
-                    b.setOpaque(true);
-                } else {
-                    b.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
-                    b.setOpaque(false);
-                }
-            }
-        }
-        tabsPanel.repaint();
-    }
-
-    public void showChats() {
-        if (!currentTab.equals("Chats"))
-            updateTabs("Chats");
+    private void showSuggestions() {
         contentPanel.removeAll();
+        java.util.List<String> suggestions = Database.Load_Friend_of_Friends();
+        java.util.HashMap<String, java.util.List<String>> mutuals = Database.mutual_frndz(suggestions);
+        java.util.List<String> sorted = Database.Sort_by_mutual_count(suggestions, mutuals);
 
-        ArrayList<com.facebook.Chat> chats = Database.LoadInbox();
-        if (chats.isEmpty()) {
-            addEmptyMessage("No active chats.");
+        if (sorted.isEmpty()) {
+            addEmptyMessage("No suggestions available.");
         } else {
-            for (com.facebook.Chat c : chats) {
-                if (c instanceof com.facebook.DM_chat) {
-                    com.facebook.DM_chat dm = (com.facebook.DM_chat) c;
-                    String other = dm.getR_username();
-                    contentPanel.add(createChatRow(Database.LoadUser(other)));
+            for (String s : sorted) {
+                User u = Database.LoadUser(s);
+                if (u != null) {
+                    contentPanel.add(createFindFriendRow(u));
                     contentPanel.add(Box.createVerticalStrut(15));
                 }
-                // Group chats can be added here too
-            }
-        }
-        refreshUI();
-    }
-
-    private JPanel createChatRow(User user) {
-        JPanel row = createBaseCard(user);
-
-        AnimatedButton openBtn = new AnimatedButton("Open Chat", FacebookGUI.FB_BLUE, FacebookGUI.FB_BLUE_HOVER);
-        openBtn.setPreferredSize(new Dimension(120, 38));
-        openBtn.setCornerRadius(19); // Rounder
-        openBtn.addActionListener(e -> {
-            if (homePage != null) {
-                homePage.openChatWithFriend(user.getCredentials().getUsername());
-            }
-        });
-
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        actions.setOpaque(false);
-        actions.add(openBtn);
-
-        row.add(actions, BorderLayout.EAST);
-        return row;
-    }
-
-    private void showAllFriends() {
-        contentPanel.removeAll();
-        ArrayList<String> friends = Database.Load_Friends(Main.current.getCredentials().getUsername());
-
-        if (friends.isEmpty()) {
-            addEmptyMessage("No friends added yet.");
-        } else {
-            for (String f : friends) {
-                contentPanel.add(createFriendRow(Database.LoadUser(f)));
-                contentPanel.add(Box.createVerticalStrut(15));
             }
         }
         refreshUI();
@@ -238,26 +206,162 @@ public class FriendsPanel extends JPanel {
         refreshUI();
     }
 
+    public void showChats() {
+        if (!currentTab.equals("Chats"))
+            updateTabs("Chats");
+        contentPanel.removeAll();
+
+        ArrayList<com.facebook.Chat> chats = Database.LoadInbox();
+        if (chats.isEmpty()) {
+            addEmptyMessage("No active chats.");
+        } else {
+            for (com.facebook.Chat c : chats) {
+                if (c instanceof com.facebook.DM_chat) {
+                    com.facebook.DM_chat dm = (com.facebook.DM_chat) c;
+                    String other = dm.getR_username();
+                    // Get last message
+                    ArrayList<Message> msgs = Database.Load_ALLMessages(dm.getFolder_path());
+                    Message lastMsg = msgs.isEmpty() ? null : msgs.get(msgs.size() - 1);
+                    contentPanel.add(createChatRow(Database.LoadUser(other), lastMsg));
+                    contentPanel.add(Box.createVerticalStrut(15));
+                }
+                // Group chats can be added here too
+            }
+        }
+        refreshUI();
+    }
+
+    private JPanel createChatRow(User user, Message lastMsg) {
+        JPanel row = createBaseCard(user);
+        Component centerComp = ((BorderLayout) row.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+        if (centerComp instanceof JPanel) {
+            JPanel info = (JPanel) centerComp;
+            if (lastMsg != null) {
+                String preview = lastMsg.getContent();
+                if (preview.length() > 30)
+                    preview = preview.substring(0, 27) + "...";
+                if (lastMsg.getSender().equals(Main.current.getFirstname()))
+                    preview = "You: " + preview;
+
+                JLabel msgLabel = new JLabel(preview);
+                msgLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+                msgLabel.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
+
+                if (info.getComponentCount() > 1) {
+                    info.remove(1);
+                    info.add(msgLabel);
+                }
+            }
+        }
+        AnimatedButton openBtn = new AnimatedButton("Open", FacebookGUI.FB_BLUE, FacebookGUI.FB_BLUE_HOVER);
+        openBtn.setPreferredSize(new Dimension(80, 36));
+        openBtn.setCornerRadius(18);
+        openBtn.addActionListener(e -> {
+            if (homePage != null) {
+                homePage.openChatWithFriend(user.getCredentials().getUsername());
+            }
+        });
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        actions.setOpaque(false);
+        actions.add(openBtn);
+        row.add(actions, BorderLayout.EAST);
+        return row;
+    }
+
+    private void showAllFriends() {
+        contentPanel.removeAll();
+        ArrayList<String> friends = Database.Load_Friends(Main.current.getCredentials().getUsername());
+
+        if (friends.isEmpty()) {
+            addEmptyMessage("No friends added yet.");
+        } else {
+            for (String f : friends) {
+                contentPanel.add(createFriendRow(Database.LoadUser(f)));
+                contentPanel.add(Box.createVerticalStrut(15));
+            }
+        }
+        refreshUI();
+    }
+
+    private void showSentRequests() {
+        contentPanel.removeAll();
+        ArrayList<String> sent = Database.Load_Requests_Sent();
+
+        if (sent.isEmpty()) {
+            addEmptyMessage("No sent requests.");
+        } else {
+            for (String s : sent) {
+                contentPanel.add(createSentRequestRow(Database.LoadUser(s)));
+                contentPanel.add(Box.createVerticalStrut(15));
+            }
+        }
+        refreshUI();
+    }
+
     private JPanel createFriendRow(User user) {
-        // Use custom message button logic here instead of generic createRowBase
         JPanel row = createBaseCard(user);
 
-        AnimatedButton msgBtn = new AnimatedButton("Message", FacebookGUI.FB_GREEN, FacebookGUI.FB_GREEN_HOVER);
-        msgBtn.setPreferredSize(new Dimension(120, 38));
-        msgBtn.setCornerRadius(19); // Super round (half of 38 height)
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        actions.setOpaque(false);
+
+        AnimatedButton profileBtn = new AnimatedButton("View Profile", new Color(228, 230, 235),
+                new Color(210, 213, 218));
+        profileBtn.setForeground(Color.BLACK);
+        profileBtn.setPreferredSize(new Dimension(110, 36));
+        profileBtn.addActionListener(e -> homePage.showProfilePanel(user));
+
+        AnimatedButton msgBtn = new AnimatedButton("Message", FacebookGUI.FB_BLUE, FacebookGUI.FB_BLUE_HOVER);
+        msgBtn.setPreferredSize(new Dimension(100, 36));
         msgBtn.addActionListener(e -> {
             if (homePage != null) {
                 homePage.openChatWithFriend(user.getCredentials().getUsername());
             }
         });
 
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        actions.setOpaque(false);
+        actions.add(profileBtn);
+
+        // Unfriend Button
+        AnimatedButton unfriendBtn = new AnimatedButton("Unfriend", new Color(228, 230, 235), new Color(210, 213, 218));
+        unfriendBtn.setForeground(Color.BLACK);
+        unfriendBtn.setPreferredSize(new Dimension(100, 36));
+        unfriendBtn.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Are you sure you want to unfriend " + user.getFullName() + "?", "Unfriend",
+                    JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                Database.RemoveFriend(user.getCredentials().getUsername());
+                showAllFriends(); // Refresh list
+            }
+        });
+
         actions.add(msgBtn);
+        actions.add(unfriendBtn);
 
         row.add(actions, BorderLayout.EAST);
         return row;
     }
+
+    private JPanel createSentRequestRow(User user) {
+        JPanel row = createBaseCard(user);
+
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        actions.setOpaque(false);
+
+        AnimatedButton cancelBtn = new AnimatedButton("Cancel Request", new Color(228, 230, 235),
+                new Color(210, 213, 218));
+        cancelBtn.setForeground(Color.BLACK);
+        cancelBtn.setPreferredSize(new Dimension(140, 36));
+        cancelBtn.addActionListener(e -> {
+            Database.Delete_FriendRequest_Sent(user.getCredentials().getUsername());
+            showSentRequests();
+        });
+
+        actions.add(cancelBtn);
+        row.add(actions, BorderLayout.EAST);
+        return row;
+    }
+
+    // ... Rest content (showRequests, createRequestRow, showFindFriends, etc) ...
 
     private JPanel createRequestRow(User user) {
         JPanel row = createBaseCard(user);
@@ -305,10 +409,15 @@ public class FriendsPanel extends JPanel {
         if (isFriend) {
             actionBtn = new JButton("Friends");
             actionBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            actionBtn.setForeground(FacebookGUI.FB_GREEN);
+            actionBtn.setContentAreaFilled(false);
+            actionBtn.setBorderPainted(false);
             actionBtn.setEnabled(false);
         } else if (requestSent) {
-            actionBtn = new AnimatedButton("Cancel Request", new Color(228, 230, 235), new Color(210, 213, 218));
-            actionBtn.setForeground(Color.BLACK);
+            // Updated to be more distinct "Pending"
+            actionBtn = new AnimatedButton("Pending", new Color(235, 245, 255), new Color(225, 235, 245));
+            actionBtn.setForeground(FacebookGUI.FB_BLUE); // Blue text
+            actionBtn.setToolTipText("Click to cancel request");
             actionBtn.addActionListener(e -> {
                 Database.Delete_FriendRequest_Sent(username);
                 showFindFriends(); // Refresh to update button state
@@ -323,6 +432,13 @@ public class FriendsPanel extends JPanel {
 
         actionBtn.setPreferredSize(new Dimension(140, 38));
 
+        AnimatedButton profileBtn = new AnimatedButton("View Profile", new Color(228, 230, 235),
+                new Color(210, 213, 218));
+        profileBtn.setForeground(Color.BLACK);
+        profileBtn.setPreferredSize(new Dimension(110, 36));
+        profileBtn.addActionListener(e -> homePage.showProfilePanel(user));
+
+        actions.add(profileBtn);
         actions.add(actionBtn);
         row.add(actions, BorderLayout.EAST);
         return row;

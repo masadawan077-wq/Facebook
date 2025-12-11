@@ -17,6 +17,7 @@ public class HomePage extends JPanel {
     private FeedPanel feedPanel;
     private RightSidebar rightSidebar;
     private FriendsPanel friendsPanel;
+    private ProfilePanel profilePanel;
 
     private JPanel mainContent;
     private JScrollPane leftScrollPane;
@@ -77,6 +78,11 @@ public class HomePage extends JPanel {
         chatDialog.setVisible(true);
     }
 
+    public void openChatWithGroup(com.facebook.Group_chat groupChat) {
+        GroupChatDialog chatDialog = new GroupChatDialog(parent, groupChat);
+        chatDialog.setVisible(true);
+    }
+
     public void openGamesDialog() {
         GamesDialog gamesDialog = new GamesDialog(parent);
         gamesDialog.setVisible(true);
@@ -84,6 +90,30 @@ public class HomePage extends JPanel {
 
     public void refreshFeed() {
         feedPanel.refreshFeed();
+    }
+
+    public void showProfilePanel(com.facebook.User user) {
+        // Always create a new panel to reflect the specific user and state
+        profilePanel = new ProfilePanel(parent, this, user);
+
+        mainContent.removeAll();
+        mainContent.add(leftScrollPane, BorderLayout.WEST);
+
+        JScrollPane profileScrollPane = new JScrollPane(profilePanel);
+        profileScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        profileScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        profileScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        profileScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        mainContent.add(profileScrollPane, BorderLayout.CENTER);
+        mainContent.add(rightScrollPane, BorderLayout.EAST);
+
+        mainContent.revalidate();
+        mainContent.repaint();
+    }
+
+    public void showProfilePanel() {
+        showProfilePanel(Main.current);
     }
 
     public void showFriendsPanel() {
@@ -119,6 +149,17 @@ public class HomePage extends JPanel {
         mainContent.add(rightScrollPane, BorderLayout.EAST);
 
         feedPanel.refreshFeed();
+
+        mainContent.revalidate();
+        mainContent.repaint();
+    }
+
+    public void showSettingsPanel() {
+        SettingsPanel settingsPanel = new SettingsPanel(parent, this);
+        mainContent.removeAll();
+        mainContent.add(leftScrollPane, BorderLayout.WEST);
+        mainContent.add(settingsPanel, BorderLayout.CENTER);
+        mainContent.add(rightScrollPane, BorderLayout.EAST);
 
         mainContent.revalidate();
         mainContent.repaint();

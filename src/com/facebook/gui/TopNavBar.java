@@ -36,6 +36,58 @@ public class TopNavBar extends JPanel {
         initComponents();
     }
 
+    private void performGlobalSearch(String query) {
+        if (query.isEmpty() || query.equals("Search Facebook"))
+            return;
+
+        JPopupMenu searchPopup = new JPopupMenu();
+        searchPopup.setBackground(Color.WHITE);
+        searchPopup.setBorder(BorderFactory.createLineBorder(new Color(219, 223, 231)));
+        searchPopup.setPreferredSize(new Dimension(300, 400));
+
+        java.util.ArrayList<com.facebook.User> results = com.facebook.Database.Search_Users_By_Name(query);
+
+        if (results.isEmpty()) {
+            JMenuItem noRes = new JMenuItem("No results found for '" + query + "'");
+            noRes.setEnabled(false);
+            searchPopup.add(noRes);
+        } else {
+            for (com.facebook.User u : results) {
+                JPanel row = new JPanel(new BorderLayout(10, 0));
+                row.setBackground(Color.WHITE);
+                row.setBorder(new EmptyBorder(5, 10, 5, 10));
+
+                JLabel name = new JLabel(u.getFullName());
+                name.setFont(new Font("Segoe UI", Font.BOLD, 14));
+                JLabel sub = new JLabel(u.getCredentials().getUsername());
+                sub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+                sub.setForeground(Color.GRAY);
+
+                JPanel text = new JPanel(new GridLayout(2, 1));
+                text.setOpaque(false);
+                text.add(name);
+                text.add(sub);
+
+                row.add(text, BorderLayout.CENTER);
+
+                JMenuItem item = new JMenuItem();
+                item.setLayout(new BorderLayout());
+                item.add(row);
+                item.setBackground(Color.WHITE);
+                item.setPreferredSize(new Dimension(280, 50));
+
+                item.addActionListener(e -> {
+                    homePage.showProfilePanel(u);
+                });
+
+                searchPopup.add(item);
+            }
+        }
+
+        searchPopup.show(searchField, 0, searchField.getHeight());
+        searchField.requestFocusInWindow();
+    }
+
     private void initComponents() {
         // ==================== LEFT SECTION (Logo + Search) ====================
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
@@ -112,6 +164,7 @@ public class TopNavBar extends JPanel {
         searchField.setOpaque(false);
         searchField.setBorder(new EmptyBorder(0, 40, 0, 15)); // Centered text vertically
         searchField.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        searchField.addActionListener(e -> performGlobalSearch(searchField.getText().trim()));
 
         JPanel searchPanel = new JPanel(null);
         searchPanel.setPreferredSize(new Dimension(240, 40));
@@ -146,27 +199,31 @@ public class TopNavBar extends JPanel {
 
         homeBtn.addActionListener(e -> {
             setActiveButton(homeBtn);
+            homePage.showFeedPanel();
             homePage.refreshFeed();
         });
 
         friendsBtn.addActionListener(e -> {
             setActiveButton(friendsBtn);
-            // TODO: Show friends page
+            homePage.showFriendsPanel();
         });
 
         watchBtn.addActionListener(e -> {
             setActiveButton(watchBtn);
-            // TODO: Show watch page
+            JOptionPane.showMessageDialog(parent, "Watch Video functionality coming soon!", "Watch",
+                    JOptionPane.INFORMATION_MESSAGE);
         });
 
         marketplaceBtn.addActionListener(e -> {
             setActiveButton(marketplaceBtn);
-            // TODO: Show marketplace
+            JOptionPane.showMessageDialog(parent, "Marketplace functionality coming soon!", "Marketplace",
+                    JOptionPane.INFORMATION_MESSAGE);
         });
 
         groupsBtn.addActionListener(e -> {
             setActiveButton(groupsBtn);
-            // TODO: Show groups
+            JOptionPane.showMessageDialog(parent, "Groups functionality coming soon!", "Groups",
+                    JOptionPane.INFORMATION_MESSAGE);
         });
 
         centerPanel.add(homeBtn);
@@ -196,13 +253,19 @@ public class TopNavBar extends JPanel {
         // Profile button with dropdown
         profileBtn = createProfileButton();
 
+        // Refresh button
+        IconButton refreshBtn = new IconButton("🔄", "Refresh", false);
+        refreshBtn.addActionListener(e -> {
+            homePage.refreshFeed();
+            JOptionPane.showMessageDialog(parent, "Page Refreshed!", "Refresh", JOptionPane.INFORMATION_MESSAGE);
+        });
+
         rightPanel.add(gamesBtn);
         rightPanel.add(messagesBtn);
         rightPanel.add(notificationsBtn);
         rightPanel.add(profileBtn);
-        rightPanel.add(Box.createHorizontalStrut(10));
+        rightPanel.add(refreshBtn);
 
-        // ==================== Add to main panel ====================
         add(leftPanel, BorderLayout.WEST);
         add(centerPanel, BorderLayout.CENTER);
         add(rightPanel, BorderLayout.EAST);
@@ -345,22 +408,28 @@ public class TopNavBar extends JPanel {
         title.setFont(new Font("Segoe UI", Font.BOLD, 24));
         title.setBorder(new EmptyBorder(15, 15, 15, 15));
 
-        // List friends
-        JPanel friendsList = new JPanel();
-        friendsList.setLayout(new BoxLayout(friendsList, BoxLayout.Y_AXIS));
-        friendsList.setBackground(Color.WHITE);
+        // List chats logic
+        JPanel chatsList = new JPanel();
+        chatsList.setLayout(new BoxLayout(chatsList, BoxLayout.Y_AXIS));
+        chatsList.setBackground(Color.WHITE);
 
-        java.util.ArrayList<String> friends = com.facebook.Database
-                .Load_Friends(Main.current.getCredentials().getUsername());
-        for (String friendUsername : friends) {
-            com.facebook.User friend = com.facebook.Database.LoadUser(friendUsername);
-            if (friend != null) {
-                JPanel friendItem = createFriendChatItem(friend, dialog);
-                friendsList.add(friendItem);
+        java.util.ArrayList<com.facebook.Chat> inbox = com.facebook.Database.LoadInbox();
+
+        if (inbox.isEmpty()) {
+            JLabel noChats = new JLabel("No chats yet.");
+            noChats.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            noChats.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
+            noChats.setAlignmentX(Component.CENTER_ALIGNMENT);
+            chatsList.add(Box.createVerticalStrut(20));
+            chatsList.add(noChats);
+        } else {
+            for (com.facebook.Chat chat : inbox) {
+                JPanel item = createChatRow(chat, dialog);
+                chatsList.add(item);
             }
         }
 
-        JScrollPane scrollPane = new JScrollPane(friendsList);
+        JScrollPane scrollPane = new JScrollPane(chatsList);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
         panel.add(title, BorderLayout.NORTH);
@@ -368,6 +437,18 @@ public class TopNavBar extends JPanel {
 
         dialog.add(panel);
         dialog.setVisible(true);
+    }
+
+    private JPanel createChatRow(com.facebook.Chat chat, JDialog dialog) {
+        if (chat instanceof com.facebook.DM_chat) {
+            com.facebook.DM_chat dm = (com.facebook.DM_chat) chat;
+            com.facebook.User friend = com.facebook.Database.LoadUser(dm.getR_username());
+            return createFriendChatItem(friend, dialog);
+        } else if (chat instanceof com.facebook.Group_chat) {
+            com.facebook.Group_chat gc = (com.facebook.Group_chat) chat;
+            return createGroupChatItem(gc, dialog);
+        }
+        return new JPanel();
     }
 
     private JPanel createFriendChatItem(com.facebook.User friend, JDialog parentDialog) {
@@ -435,6 +516,54 @@ public class TopNavBar extends JPanel {
         return item;
     }
 
+    private JPanel createGroupChatItem(com.facebook.Group_chat group, JDialog parentDialog) {
+        JPanel item = new JPanel(new BorderLayout(10, 0));
+        item.setBackground(Color.WHITE);
+        item.setBorder(new EmptyBorder(10, 15, 10, 15));
+        item.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Group Icon
+        JLabel groupIcon = new JLabel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(FacebookGUI.FB_BLUE);
+                g2.fillOval(0, 5, 25, 25);
+                g2.setColor(FacebookGUI.FB_GREEN);
+                g2.fillOval(8, 5, 25, 25);
+                g2.dispose();
+            }
+        };
+        groupIcon.setPreferredSize(new Dimension(40, 40));
+
+        JLabel nameLabel = new JLabel(group.getGroupName() + " (Group)");
+        nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 15));
+
+        item.add(groupIcon, BorderLayout.WEST);
+        item.add(nameLabel, BorderLayout.CENTER);
+
+        item.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                parentDialog.dispose();
+                homePage.openChatWithGroup(group);
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                item.setBackground(new Color(240, 242, 245));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                item.setBackground(Color.WHITE);
+            }
+        });
+
+        return item;
+    }
+
     private void showNotificationsDialog() {
         JDialog dialog = new JDialog(parent, "Notifications", false);
         dialog.setSize(400, 500);
@@ -451,25 +580,45 @@ public class TopNavBar extends JPanel {
         notifList.setLayout(new BoxLayout(notifList, BoxLayout.Y_AXIS));
         notifList.setBackground(Color.WHITE);
 
-        // Load notifications
-        java.util.ArrayList<com.facebook.Notification> notifications = com.facebook.Database
-                .Load_Unread_Notification();
+        // Force refresh
+        com.facebook.Database.Compute_Read_Unread();
 
-        if (notifications.isEmpty()) {
-            JLabel noNotif = new JLabel("No new notifications");
+        java.util.ArrayList<com.facebook.Notification> unread = com.facebook.Database.Load_Unread_Notification();
+        java.util.ArrayList<com.facebook.Notification> read = com.facebook.Database.Load_Read_Notifications();
+
+        if (unread.isEmpty() && read.isEmpty()) {
+            JLabel noNotif = new JLabel("No notifications");
             noNotif.setFont(new Font("Segoe UI", Font.PLAIN, 14));
             noNotif.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
             noNotif.setBorder(new EmptyBorder(20, 15, 20, 15));
             notifList.add(noNotif);
         } else {
-            for (com.facebook.Notification notif : notifications) {
-                JPanel notifItem = createNotificationItem(notif);
-                notifList.add(notifItem);
+            if (!unread.isEmpty()) {
+                JLabel newHeader = new JLabel("New");
+                newHeader.setFont(new Font("Segoe UI", Font.BOLD, 16));
+                newHeader.setBorder(new EmptyBorder(10, 15, 5, 15));
+                notifList.add(newHeader);
+
+                for (com.facebook.Notification notif : unread) {
+                    notifList.add(createNotificationItem(notif, true));
+                }
+            }
+
+            if (!read.isEmpty()) {
+                JLabel earlierHeader = new JLabel("Earlier");
+                earlierHeader.setFont(new Font("Segoe UI", Font.BOLD, 16));
+                earlierHeader.setBorder(new EmptyBorder(10, 15, 5, 15));
+                notifList.add(earlierHeader);
+
+                for (com.facebook.Notification notif : read) {
+                    notifList.add(createNotificationItem(notif, false));
+                }
             }
         }
 
         JScrollPane scrollPane = new JScrollPane(notifList);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.getVerticalScrollBar().setUnitIncrement(12);
 
         panel.add(title, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
@@ -478,19 +627,28 @@ public class TopNavBar extends JPanel {
         dialog.setVisible(true);
     }
 
-    private JPanel createNotificationItem(com.facebook.Notification notif) {
+    private JPanel createNotificationItem(com.facebook.Notification notif, boolean isUnread) {
         JPanel item = new JPanel(new BorderLayout(10, 0));
-        item.setBackground(new Color(240, 242, 245));
+        // Unread items have slightly blue background
+        item.setBackground(isUnread ? new Color(231, 243, 255) : Color.WHITE);
         item.setBorder(new EmptyBorder(12, 15, 12, 15));
+        item.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
 
         JLabel iconLabel = new JLabel(getNotificationIcon(notif.getType()));
         iconLabel.setFont(new Font("Segoe UI", Font.PLAIN, 24));
 
         JLabel messageLabel = new JLabel("<html>" + notif.getMessage() + "</html>");
         messageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        messageLabel.setForeground(FacebookGUI.FB_TEXT_PRIMARY);
 
         item.add(iconLabel, BorderLayout.WEST);
         item.add(messageLabel, BorderLayout.CENTER);
+
+        // Add time if available (or simplified)
+        // JLabel timeLabel = new JLabel("Just now");
+        // timeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        // timeLabel.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
+        // item.add(timeLabel, BorderLayout.EAST);
 
         return item;
     }

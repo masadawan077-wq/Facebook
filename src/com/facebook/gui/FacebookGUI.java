@@ -98,10 +98,14 @@ public class FacebookGUI extends JFrame {
 
     public void onLoginSuccess() {
         // Create HomePage after login when Main.current is available
-        if (homePage == null) {
-            homePage = new HomePage(this);
-            mainPanel.add(homePage, "HOME");
+        // Remove old home page if exists to start fresh
+        if (homePage != null) {
+            mainPanel.remove(homePage);
         }
+
+        homePage = new HomePage(this);
+        mainPanel.add(homePage, "HOME");
+
         setupHomeFrame(); // Setup frame for home page
         cardLayout.show(mainPanel, "HOME");
     }
