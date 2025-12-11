@@ -33,66 +33,25 @@ public class LeftSidebar extends JPanel {
                     // TODO: Navigate to profile
                 }));
 
-        // Meta AI
-        add(createMenuItem("🤖", "Meta AI", e -> {
-        }));
-
         // Friends
         add(createMenuItem("👥", "Friends", e -> homePage.showFriendsPanel()));
 
-        // Memories
-        add(createMenuItem("⏰", "Memories", e -> {
-        }));
-
-        // Saved
-        add(createMenuItem("🔖", "Saved", e -> {
-        }));
+        // Messages (New)
+        add(createMenuItem("💬", "Messages", e -> homePage.showMessages()));
 
         // Groups
         add(createMenuItem("👨‍👩‍👧‍👦", "Groups", e -> {
         }));
 
-        // Reels
-        add(createMenuItem("🎬", "Reels", e -> {
-        }));
-
-        // Marketplace
-        add(createMenuItem("🛒", "Marketplace", e -> {
-        }));
-
         // Feeds
         add(createMenuItem("📰", "Feeds", e -> homePage.showFeedPanel()));
 
-        // Events
-        add(createMenuItem("📅", "Events", e -> {
+        // Saved
+        add(createMenuItem("🔖", "Saved", e -> {
         }));
 
-        // See more
-        add(Box.createVerticalStrut(10));
-        JPanel seeMorePanel = createMenuItem("▼", "See more", e -> {
-        });
-        seeMorePanel.setBackground(FacebookGUI.FB_BACKGROUND);
-        add(seeMorePanel);
-
-        // Separator
-        add(Box.createVerticalStrut(15));
-        JSeparator sep = new JSeparator();
-        sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-        sep.setForeground(new Color(219, 223, 231));
-        add(sep);
-        add(Box.createVerticalStrut(15));
-
-        // Your shortcuts header
-        JLabel shortcutsLabel = new JLabel("Your shortcuts");
-        shortcutsLabel.setFont(new Font("Segoe UI", Font.BOLD, 17));
-        shortcutsLabel.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
-        shortcutsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        shortcutsLabel.setBorder(new EmptyBorder(0, 12, 10, 0));
-        add(shortcutsLabel);
-
-        // Example shortcut
-        add(createMenuItem("🎱", "8 Ball Pool", e -> {
-        }));
+        // Games (Replaces 8 ball pool and others)
+        add(createMenuItem("🎮", "Games", e -> homePage.openGamesDialog()));
 
         add(Box.createVerticalGlue());
     }
@@ -123,15 +82,15 @@ public class LeftSidebar extends JPanel {
 
     private JPanel createMenuItem(Icon icon, String text, ActionListener action) {
         JPanel panel = new JPanel(new BorderLayout(12, 0));
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52)); // Taller items
         panel.setOpaque(true);
         panel.setBackground(FacebookGUI.FB_BACKGROUND);
-        panel.setBorder(new EmptyBorder(4, 8, 4, 8));
+        panel.setBorder(new EmptyBorder(8, 12, 8, 12)); // More padding
         panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         JLabel iconLabel = new JLabel(icon);
         JLabel textLabel = new JLabel(text);
-        textLabel.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        textLabel.setFont(new Font("Segoe UI", Font.BOLD, 15)); // Bolder text
         textLabel.setForeground(FacebookGUI.FB_TEXT_PRIMARY);
 
         panel.add(iconLabel, BorderLayout.WEST);
@@ -140,7 +99,9 @@ public class LeftSidebar extends JPanel {
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                panel.setBackground(new Color(240, 242, 245));
+                panel.setBackground(new Color(228, 230, 235)); // Darker hover
+                // Add rounded corners visually if possible, but panel is square.
+                // For simplicity in Swing, we keep background.
             }
 
             @Override

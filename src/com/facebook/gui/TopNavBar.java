@@ -69,12 +69,12 @@ public class TopNavBar extends JPanel {
             }
         });
 
-        // Search Field
+        // Search Field - Pill Shape
         searchField = new JTextField("Search Facebook") {
             private boolean showPlaceholder = true;
 
             {
-                setForeground(new Color(150, 150, 150));
+                setForeground(new Color(101, 103, 107));
                 addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusGained(FocusEvent e) {
@@ -89,7 +89,7 @@ public class TopNavBar extends JPanel {
                     public void focusLost(FocusEvent e) {
                         if (getText().isEmpty()) {
                             setText("Search Facebook");
-                            setForeground(new Color(150, 150, 150));
+                            setForeground(new Color(101, 103, 107));
                             showPlaceholder = true;
                         }
                     }
@@ -102,7 +102,7 @@ public class TopNavBar extends JPanel {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
                 g2.setColor(new Color(240, 242, 245));
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 40, 40); // Pill shape
 
                 g2.dispose();
                 super.paintComponent(g);
@@ -110,7 +110,7 @@ public class TopNavBar extends JPanel {
         };
         searchField.setPreferredSize(new Dimension(240, 40));
         searchField.setOpaque(false);
-        searchField.setBorder(new EmptyBorder(10, 40, 10, 15));
+        searchField.setBorder(new EmptyBorder(0, 40, 0, 15)); // Centered text vertically
         searchField.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 
         JPanel searchPanel = new JPanel(null);
@@ -119,8 +119,9 @@ public class TopNavBar extends JPanel {
 
         // Search icon
         JLabel searchIcon = new JLabel("🔍");
-        searchIcon.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        searchIcon.setBounds(12, 10, 20, 20);
+        searchIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
+        searchIcon.setForeground(new Color(101, 103, 107));
+        searchIcon.setBounds(15, 10, 20, 20);
 
         searchField.setBounds(0, 0, 240, 40);
         searchPanel.add(searchIcon);
@@ -128,13 +129,15 @@ public class TopNavBar extends JPanel {
 
         leftPanel.add(Box.createHorizontalStrut(5));
         leftPanel.add(logoLabel);
-        leftPanel.add(Box.createHorizontalStrut(5));
+        leftPanel.add(Box.createHorizontalStrut(10));
         leftPanel.add(searchPanel);
 
         // ==================== CENTER SECTION (Navigation Icons) ====================
-        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 8));
+        // Increased centering and spacing
+        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         centerPanel.setOpaque(false);
 
+        // Use consistent emoji font
         homeBtn = new IconButton("🏠", "Home", true);
         friendsBtn = new IconButton("👥", "Friends", false);
         watchBtn = new IconButton("📺", "Watch", false);

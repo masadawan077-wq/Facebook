@@ -46,7 +46,7 @@ public class HomePage extends JPanel {
         leftScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         leftScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        leftScrollPane.setPreferredSize(new Dimension(280, 0));
+        leftScrollPane.setPreferredSize(new Dimension(300, 0)); // Increased width
 
         // Center Feed
         feedPanel = new FeedPanel(parent, this);
@@ -63,7 +63,7 @@ public class HomePage extends JPanel {
         rightScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         rightScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         rightScrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        rightScrollPane.setPreferredSize(new Dimension(300, 0));
+        rightScrollPane.setPreferredSize(new Dimension(250, 0)); // Reduced width
 
         mainContent.add(leftScrollPane, BorderLayout.WEST);
         mainContent.add(feedScrollPane, BorderLayout.CENTER);
@@ -88,7 +88,7 @@ public class HomePage extends JPanel {
 
     public void showFriendsPanel() {
         if (friendsPanel == null) {
-            friendsPanel = new FriendsPanel(parent);
+            friendsPanel = new FriendsPanel(parent, this);
         }
 
         mainContent.removeAll();
@@ -105,6 +105,11 @@ public class HomePage extends JPanel {
 
         mainContent.revalidate();
         mainContent.repaint();
+    }
+
+    public void showMessages() {
+        showFriendsPanel(); // Load panel
+        friendsPanel.showChats(); // Switch to chats
     }
 
     public void showFeedPanel() {

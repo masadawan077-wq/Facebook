@@ -2,6 +2,7 @@ package com.facebook.gui;
 
 import com.facebook.Database;
 import com.facebook.Main;
+import com.facebook.gui.components.MessageDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -101,14 +102,15 @@ public class FacebookGUI extends JFrame {
             homePage = new HomePage(this);
             mainPanel.add(homePage, "HOME");
         }
-        removeDecoration(); // Remove title bar for home page
+        setupHomeFrame(); // Setup frame for home page
         cardLayout.show(mainPanel, "HOME");
     }
 
-    public void removeDecoration() {
+    public void setupHomeFrame() {
         dispose();
-        setUndecorated(true);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(false); // Show title bar
+        setSize(1200, 750); // Set default size
+        setLocationRelativeTo(null); // Center on screen
         setVisible(true);
     }
 
@@ -124,10 +126,27 @@ public class FacebookGUI extends JFrame {
     public static void main(String[] args) {
         // Check database connection first
         if (!Database.Check_Database()) {
-            JOptionPane.showMessageDialog(null,
-                    "Database cannot be found!\nERROR 404",
-                    "Database Error",
-                    JOptionPane.ERROR_MESSAGE);
+            // Need to create a dummy frame for MessageDialog since main frame isn't created
+            // yet
+            JFrame dummy = new JFrame();
+            dummy.setSize(400, 300); // ensure it's "visible" enough to be a parent, or just pass null to
+                                     // MessageDialog if it supports it.
+            // But MessageDialog constructor uses parent.
+            // Since we can't easily use MessageDialog without an active window in pure
+            // Swing static context without tricks,
+            // we'll stick to basic JOptionPane for CRITICAL startup error, OR create a temp
+            // window.
+            // Let's create a temp invisible window.
+            dummy.setUndecorated(true);
+            dummy.setLocationRelativeTo(null);
+
+            MessageDialog.show(dummy, "Database Error", "Database cannot be found!\nERROR 404",
+                    MessageDialog.Type.ERROR);
+
+            // Wait a bit for user to see it? MessageDialog is modal so it blocks.
+            // But checking impl, it disposes on OK.
+
+            System.exit(1);
             return;
         }
 

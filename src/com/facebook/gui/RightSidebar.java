@@ -29,13 +29,29 @@ public class RightSidebar extends JPanel {
     }
 
     private void initComponents() {
-        // Header
+        // CONTACTS Header
+        JPanel contactsHeader = new JPanel(new BorderLayout());
+        contactsHeader.setBackground(Color.WHITE);
+        contactsHeader.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        contactsHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         JLabel contactsLabel = new JLabel("Contacts");
         contactsLabel.setFont(new Font("Segoe UI", Font.BOLD, 17));
         contactsLabel.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
-        contactsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        add(contactsLabel);
-        add(Box.createVerticalStrut(15));
+
+        // Search and options icons for contacts (visual only)
+        JPanel iconPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        iconPanel.setBackground(Color.WHITE);
+        JLabel searchIcon = new JLabel("🔍");
+        JLabel optionsIcon = new JLabel("•••");
+        iconPanel.add(searchIcon);
+        iconPanel.add(optionsIcon);
+
+        contactsHeader.add(contactsLabel, BorderLayout.WEST);
+        contactsHeader.add(iconPanel, BorderLayout.EAST);
+
+        add(contactsHeader);
+        add(Box.createVerticalStrut(10));
 
         // Friends list
         friendsListPanel = new JPanel();
@@ -49,10 +65,11 @@ public class RightSidebar extends JPanel {
         add(Box.createVerticalStrut(20));
 
         // Separator
-        JSeparator sep = new JSeparator();
-        sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-        sep.setForeground(new Color(219, 223, 231));
-        add(sep);
+        JSeparator sep2 = new JSeparator();
+        sep2.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        sep2.setForeground(new Color(219, 223, 231));
+        sep2.setAlignmentX(Component.LEFT_ALIGNMENT);
+        add(sep2);
         add(Box.createVerticalStrut(15));
 
         // Group chats header
@@ -76,6 +93,7 @@ public class RightSidebar extends JPanel {
         // Create group chat button
         add(Box.createVerticalStrut(10));
         JPanel createGroupPanel = createCreateGroupChatButton();
+        createGroupPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         add(createGroupPanel);
 
         add(Box.createVerticalGlue());
@@ -154,22 +172,51 @@ public class RightSidebar extends JPanel {
         nameLabel.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         nameLabel.setForeground(FacebookGUI.FB_TEXT_PRIMARY);
 
+        // Message Button (Small, minmalistic green)
+        // Use AnimatedButton for rounding
+        com.facebook.gui.components.AnimatedButton msgBtn = new com.facebook.gui.components.AnimatedButton("Message",
+                FacebookGUI.FB_GREEN, FacebookGUI.FB_GREEN_HOVER);
+        msgBtn.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        msgBtn.setPreferredSize(new Dimension(70, 24)); // Compact
+        msgBtn.setCornerRadius(12); // Round
+        msgBtn.setMargin(new Insets(0, 0, 0, 0));
+
+        // msgBtn:
+        msgBtn.addActionListener(e -> {
+            homePage.openChatWithFriend(friend.getCredentials().getUsername());
+        });
+
         panel.add(profileCircle, BorderLayout.WEST);
+
         panel.add(nameLabel, BorderLayout.CENTER);
+
+        // To ensure the button doesn't stretch vertically in Borderlayout.EAST, wrap
+        // it.
+        JPanel eastWrapper = new JPanel(new GridBagLayout());
+        eastWrapper.setOpaque(false);
+        eastWrapper.add(msgBtn);
+
+        panel.add(eastWrapper, BorderLayout.EAST);
 
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 panel.setBackground(new Color(240, 242, 245));
+                eastWrapper.setBackground(new Color(240, 242, 245)); // Ensure wrapper matches
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
                 panel.setBackground(Color.WHITE);
+                eastWrapper.setBackground(Color.WHITE);
             }
 
             @Override
             public void mouseClicked(MouseEvent e) {
+                // Clicking row also opens chat, consistent with previous behavior?
+                // Or maybe remove row click if button exists?
+                // User said "message button ... like everything else".
+                // Usually entire row is clickable. Making button explicit is fine.
                 homePage.openChatWithFriend(friend.getCredentials().getUsername());
             }
         });
@@ -300,5 +347,39 @@ public class RightSidebar extends JPanel {
     public void refresh() {
         loadFriendsList();
         loadGroupChats();
+    }
+
+    private JPanel createAdItem(String impPath, String title, String url) {
+        JPanel panel = new JPanel(new BorderLayout(10, 0));
+        panel.setBackground(Color.WHITE);
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Placeholder for ad image
+        JPanel imgPlaceholder = new JPanel();
+        imgPlaceholder.setPreferredSize(new Dimension(100, 100));
+        imgPlaceholder.setBackground(new Color(240, 242, 245));
+        imgPlaceholder.setBorder(new javax.swing.border.LineBorder(new Color(230, 230, 230), 1));
+
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+        textPanel.setBackground(Color.WHITE);
+
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 15));
+
+        JLabel urlLabel = new JLabel(url);
+        urlLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        urlLabel.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
+
+        textPanel.add(Box.createVerticalGlue());
+        textPanel.add(titleLabel);
+        textPanel.add(urlLabel);
+        textPanel.add(Box.createVerticalGlue());
+
+        panel.add(imgPlaceholder, BorderLayout.WEST);
+        panel.add(textPanel, BorderLayout.CENTER);
+
+        return panel;
     }
 }

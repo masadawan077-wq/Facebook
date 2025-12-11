@@ -41,6 +41,9 @@ public class ChatDialog extends JDialog {
         // Load or create chat
         loadChat();
 
+        setUndecorated(true); // Modern look
+        setBackground(new Color(0, 0, 0, 0)); // Transparent for shapes
+
         setSize(450, 600);
         setLocationRelativeTo(parent);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -55,6 +58,22 @@ public class ChatDialog extends JDialog {
                 stopRefreshTimer();
             }
         });
+
+        // Drag support
+        MouseAdapter ma = new MouseAdapter() {
+            private int x, y;
+
+            public void mousePressed(MouseEvent e) {
+                x = e.getX();
+                y = e.getY();
+            }
+
+            public void mouseDragged(MouseEvent e) {
+                setLocation(getLocation().x + e.getX() - x, getLocation().y + e.getY() - y);
+            }
+        };
+        addMouseListener(ma);
+        addMouseMotionListener(ma);
     }
 
     private void loadChat() {
@@ -79,16 +98,39 @@ public class ChatDialog extends JDialog {
     }
 
     private void initComponents() {
-        JPanel mainPanel = new JPanel(new BorderLayout());
+        RoundedPanel mainPanel = new RoundedPanel(15);
+        mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
-        // Header
+        // Custom Header with Close Button
         JPanel header = new JPanel(new BorderLayout(12, 0));
         header.setBackground(Color.WHITE);
         header.setBorder(new EmptyBorder(12, 15, 12, 15));
-        header.setPreferredSize(new Dimension(0, 60));
+        header.setPreferredSize(new Dimension(0, 70));
 
-        // Friend profile
+        // Window Controls
+        JPanel windowControls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        windowControls.setOpaque(false);
+        JLabel closeBtn = new JLabel("✕");
+        closeBtn.setFont(new Font("Segoe UI", Font.BOLD, 22)); // Larger
+        closeBtn.setForeground(Color.BLACK); // High visibility
+        closeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        closeBtn.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                dispose();
+            }
+
+            public void mouseEntered(MouseEvent e) {
+                closeBtn.setForeground(FacebookGUI.FB_ERROR);
+            }
+
+            public void mouseExited(MouseEvent e) {
+                closeBtn.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
+            }
+        });
+        windowControls.add(closeBtn);
+
+        // Friend profile in header
         JLabel profileCircle = new JLabel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -135,8 +177,13 @@ public class ChatDialog extends JDialog {
         friendInfo.add(nameLabel);
         friendInfo.add(statusLabel);
 
-        header.add(profileCircle, BorderLayout.WEST);
-        header.add(friendInfo, BorderLayout.CENTER);
+        JPanel leftHeader = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        leftHeader.setOpaque(false);
+        leftHeader.add(profileCircle);
+        leftHeader.add(friendInfo);
+
+        header.add(leftHeader, BorderLayout.WEST);
+        header.add(windowControls, BorderLayout.EAST);
 
         // Messages area
         messagesPanel = new JPanel();

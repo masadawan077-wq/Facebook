@@ -27,17 +27,45 @@ public class GamesDialog extends JDialog {
         this.parent = parent;
         this.games = Main.Get_ALL_games();
 
+        setUndecorated(true);
+        setBackground(new Color(0, 0, 0, 0));
+
         setSize(500, 400);
         setLocationRelativeTo(parent);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         initComponents();
+
+        // Drag support
+        MouseAdapter ma = new MouseAdapter() {
+            private int x, y;
+
+            public void mousePressed(MouseEvent e) {
+                x = e.getX();
+                y = e.getY();
+            }
+
+            public void mouseDragged(MouseEvent e) {
+                setLocation(getLocation().x + e.getX() - x, getLocation().y + e.getY() - y);
+            }
+        };
+        addMouseListener(ma);
+        addMouseMotionListener(ma);
     }
 
     private void initComponents() {
-        JPanel mainPanel = new JPanel(new BorderLayout(0, 20));
+        RoundedPanel mainPanel = new RoundedPanel(15);
+        mainPanel.setLayout(new BorderLayout(0, 20));
         mainPanel.setBackground(Color.WHITE);
         mainPanel.setBorder(new EmptyBorder(25, 25, 25, 25));
+
+        // Header with Close
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(Color.WHITE);
+
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+        titlePanel.setBackground(Color.WHITE);
 
         // Title
         JLabel titleLabel = new JLabel("🎮 Play Games");
@@ -49,17 +77,35 @@ public class GamesDialog extends JDialog {
         descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         descLabel.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
 
-        JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-        headerPanel.setBackground(Color.WHITE);
-        headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        titlePanel.add(titleLabel);
+        titlePanel.add(Box.createVerticalStrut(8));
+        titlePanel.add(descLabel);
 
-        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Close Button
+        JLabel closeBtn = new JLabel("✕");
+        closeBtn.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        closeBtn.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
+        closeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        closeBtn.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                dispose();
+            }
 
-        headerPanel.add(titleLabel);
-        headerPanel.add(Box.createVerticalStrut(8));
-        headerPanel.add(descLabel);
+            public void mouseEntered(MouseEvent e) {
+                closeBtn.setForeground(FacebookGUI.FB_ERROR);
+            }
+
+            public void mouseExited(MouseEvent e) {
+                closeBtn.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
+            }
+        });
+
+        JPanel closePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        closePanel.setOpaque(false);
+        closePanel.add(closeBtn);
+
+        headerPanel.add(titlePanel, BorderLayout.CENTER);
+        headerPanel.add(closePanel, BorderLayout.EAST);
 
         // Games list
         JPanel gamesPanel = new JPanel();
@@ -176,21 +222,25 @@ public class GamesDialog extends JDialog {
     }
 
     private String getGameIcon(String gameName) {
-        return switch (gameName) {
-            case "TicTacToe" -> "⭕";
-            case "Hangman" -> "💭";
-            case "Snake" -> "🐍";
-            default -> "🎮";
-        };
+        String name = gameName.toUpperCase();
+        if (name.contains("TIC"))
+            return "⭕";
+        if (name.contains("HANG"))
+            return "💭";
+        if (name.contains("SNAKE"))
+            return "🐍";
+        return "🎮";
     }
 
     private String getGameDescription(String gameName) {
-        return switch (gameName) {
-            case "TicTacToe" -> "Classic X and O game - First to 3 in a row wins!";
-            case "Hangman" -> "Guess the word before hangman is complete!";
-            case "Snake" -> "Control the snake and eat food to grow!";
-            default -> "Have fun playing!";
-        };
+        String name = gameName.toUpperCase();
+        if (name.contains("TIC"))
+            return "Classic X and O game - First to 3 in a row wins!";
+        if (name.contains("HANG"))
+            return "Guess the word before hangman is complete!";
+        if (name.contains("SNAKE"))
+            return "Control the snake and eat food to grow!";
+        return "Have fun playing!";
     }
 
     private void launchGame(Game game) {
@@ -199,25 +249,28 @@ public class GamesDialog extends JDialog {
         // Launch based on game name
         SwingUtilities.invokeLater(() -> {
             try {
-                String gameName = game.getName();
+                String gameName = game.getName().toUpperCase();
 
                 JOptionPane.showMessageDialog(parent,
-                        "Launching " + gameName + "...\nThe game will open in console mode.",
+                        "Launching " + game.getName() + "...",
                         "Game Launch",
                         JOptionPane.INFORMATION_MESSAGE);
 
                 // Launch the game in a separate thread
                 new Thread(() -> {
                     try {
-                        if (gameName.equals("TicTacToe")) {
+                        if (gameName.contains("TIC")) {
                             TicTacToe ticTacToe = new TicTacToe();
                             ticTacToe.Game_launch();
-                        } else if (gameName.equals("Hangman")) {
+                        } else if (gameName.contains("HANG")) {
                             Hangman hangman = new Hangman();
                             hangman.Game_launch();
-                        } else if (gameName.equals("Snake")) {
+                        } else if (gameName.contains("SNAKE")) {
                             SnakeGame snake = new SnakeGame();
                             snake.Game_launch();
+                        } else {
+                            // Fallback try simple launch if allows
+                            // But we only know these 3 for now.
                         }
                     } catch (Exception e) {
                         SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(parent,

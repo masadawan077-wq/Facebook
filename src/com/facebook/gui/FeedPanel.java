@@ -32,10 +32,12 @@ public class FeedPanel extends JPanel {
 
     private void initComponents() {
         // Create post card
+
+        // Create post card
         RoundedPanel createPostCard = new RoundedPanel(8);
         createPostCard.setBackground(Color.WHITE);
         createPostCard.setLayout(new BorderLayout(12, 12));
-        createPostCard.setBorder(new EmptyBorder(15, 15, 15, 15));
+        createPostCard.setBorder(new EmptyBorder(12, 16, 12, 16)); // Refined padding
         createPostCard.setMaximumSize(new Dimension(600, 120));
         createPostCard.setPreferredSize(new Dimension(600, 120));
         createPostCard.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -431,7 +433,7 @@ public class FeedPanel extends JPanel {
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(inputPanel, BorderLayout.SOUTH);
 
-        dialog.add(panel);
         dialog.setVisible(true);
     }
+
 }

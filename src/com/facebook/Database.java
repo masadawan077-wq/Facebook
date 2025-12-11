@@ -1127,6 +1127,12 @@ public class Database {
     }
 
     public static ArrayList<Notification> Load_Unread_Notification() {
+        if (unread == null) {
+            Compute_Read_Unread(); // Try to load first
+            if (unread == null) { // If still null (e.g. file issue), init empty
+                unread = new ArrayList<>();
+            }
+        }
         if (unread.isEmpty())
             return new ArrayList<>();
         else

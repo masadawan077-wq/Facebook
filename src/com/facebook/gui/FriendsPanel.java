@@ -14,11 +14,13 @@ import java.util.List;
 
 public class FriendsPanel extends JPanel {
 
+    private HomePage homePage;
     private JPanel contentPanel;
     private JPanel tabsPanel;
     private String currentTab = "All Friends"; // "All Friends", "Requests", "Find Friends"
 
-    public FriendsPanel(FacebookGUI parent) {
+    public FriendsPanel(FacebookGUI parent, HomePage homePage) {
+        this.homePage = homePage;
         setBackground(FacebookGUI.FB_BACKGROUND);
         setLayout(new BorderLayout());
 
@@ -35,15 +37,16 @@ public class FriendsPanel extends JPanel {
 
         // Header
         JLabel title = new JLabel("Friends");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        title.setFont(new Font("Segoe UI", Font.BOLD, 28)); // Bigger title
         title.setForeground(FacebookGUI.FB_TEXT_PRIMARY);
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Tabs
-        tabsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 15));
+        tabsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 20));
         tabsPanel.setBackground(FacebookGUI.FB_BACKGROUND);
         tabsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        tabsPanel.add(createTabButton("Chats"));
         tabsPanel.add(createTabButton("All Friends"));
         tabsPanel.add(createTabButton("Requests"));
         tabsPanel.add(createTabButton("Find Friends"));
@@ -57,14 +60,14 @@ public class FriendsPanel extends JPanel {
         contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(FacebookGUI.FB_BACKGROUND);
-        contentPanel.setBorder(new EmptyBorder(0, 10, 20, 10));
+        contentPanel.setBorder(new EmptyBorder(0, 20, 20, 20));
 
         add(new JScrollPane(contentPanel), BorderLayout.CENTER);
     }
 
     private JButton createTabButton(String name) {
         JButton btn = new JButton(name);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
@@ -82,6 +85,7 @@ public class FriendsPanel extends JPanel {
         btn.addActionListener(e -> {
             updateTabs(name);
             switch (name) {
+                case "Chats" -> showChats();
                 case "All Friends" -> showAllFriends();
                 case "Requests" -> showRequests();
                 case "Find Friends" -> showFindFriends();
@@ -108,6 +112,48 @@ public class FriendsPanel extends JPanel {
         tabsPanel.repaint();
     }
 
+    public void showChats() {
+        if (!currentTab.equals("Chats"))
+            updateTabs("Chats");
+        contentPanel.removeAll();
+
+        ArrayList<com.facebook.Chat> chats = Database.LoadInbox();
+        if (chats.isEmpty()) {
+            addEmptyMessage("No active chats.");
+        } else {
+            for (com.facebook.Chat c : chats) {
+                if (c instanceof com.facebook.DM_chat) {
+                    com.facebook.DM_chat dm = (com.facebook.DM_chat) c;
+                    String other = dm.getR_username();
+                    contentPanel.add(createChatRow(Database.LoadUser(other)));
+                    contentPanel.add(Box.createVerticalStrut(15));
+                }
+                // Group chats can be added here too
+            }
+        }
+        refreshUI();
+    }
+
+    private JPanel createChatRow(User user) {
+        JPanel row = createBaseCard(user);
+
+        AnimatedButton openBtn = new AnimatedButton("Open Chat", FacebookGUI.FB_BLUE, FacebookGUI.FB_BLUE_HOVER);
+        openBtn.setPreferredSize(new Dimension(120, 38));
+        openBtn.setCornerRadius(19); // Rounder
+        openBtn.addActionListener(e -> {
+            if (homePage != null) {
+                homePage.openChatWithFriend(user.getCredentials().getUsername());
+            }
+        });
+
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        actions.setOpaque(false);
+        actions.add(openBtn);
+
+        row.add(actions, BorderLayout.EAST);
+        return row;
+    }
+
     private void showAllFriends() {
         contentPanel.removeAll();
         ArrayList<String> friends = Database.Load_Friends(Main.current.getCredentials().getUsername());
@@ -117,7 +163,7 @@ public class FriendsPanel extends JPanel {
         } else {
             for (String f : friends) {
                 contentPanel.add(createFriendRow(Database.LoadUser(f)));
-                contentPanel.add(Box.createVerticalStrut(10));
+                contentPanel.add(Box.createVerticalStrut(15));
             }
         }
         refreshUI();
@@ -132,7 +178,7 @@ public class FriendsPanel extends JPanel {
         } else {
             for (String r : requests) {
                 contentPanel.add(createRequestRow(Database.LoadUser(r)));
-                contentPanel.add(Box.createVerticalStrut(10));
+                contentPanel.add(Box.createVerticalStrut(15));
             }
         }
         refreshUI();
@@ -143,25 +189,25 @@ public class FriendsPanel extends JPanel {
 
         // Search Bar
         JPanel searchPanel = new JPanel(new BorderLayout(10, 0));
-        searchPanel.setMaximumSize(new Dimension(600, 45));
         searchPanel.setBackground(Color.WHITE);
-        searchPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // Inner padding
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
         ModernTextField searchField = new ModernTextField("Search for people");
         AnimatedButton searchBtn = new AnimatedButton("Search", FacebookGUI.FB_BLUE, FacebookGUI.FB_BLUE_HOVER);
-        searchBtn.setPreferredSize(new Dimension(80, 35));
+        searchBtn.setPreferredSize(new Dimension(100, 42));
+        searchBtn.setCornerRadius(21);
 
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchBtn, BorderLayout.EAST);
 
-        // Wrap search bar
-        JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // Wrap search bar in a container that allows width expansion but limits height
+        JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBackground(FacebookGUI.FB_BACKGROUND);
-        wrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
-        wrapper.add(searchPanel);
+        wrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
+        wrapper.add(searchPanel, BorderLayout.CENTER);
 
         contentPanel.add(wrapper);
-        contentPanel.add(Box.createVerticalStrut(20));
+        contentPanel.add(Box.createVerticalStrut(25));
 
         // Result Container
         JPanel resultsContainer = new JPanel();
@@ -177,11 +223,12 @@ public class FriendsPanel extends JPanel {
                 if (results.isEmpty()) {
                     JLabel noRes = new JLabel("No people found matching '" + query + "'");
                     noRes.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    noRes.setFont(new Font("Segoe UI", Font.PLAIN, 16));
                     resultsContainer.add(noRes);
                 } else {
                     for (User u : results) {
                         resultsContainer.add(createFindFriendRow(u));
-                        resultsContainer.add(Box.createVerticalStrut(10));
+                        resultsContainer.add(Box.createVerticalStrut(15));
                     }
                 }
             }
@@ -192,11 +239,24 @@ public class FriendsPanel extends JPanel {
     }
 
     private JPanel createFriendRow(User user) {
-        return createRowBase(user, new String[] { "Message" }, e -> {
-            // Open chat logic handled by main
-            // For now just show message
-            JOptionPane.showMessageDialog(this, "Messaging feature available in Chat tab.");
+        // Use custom message button logic here instead of generic createRowBase
+        JPanel row = createBaseCard(user);
+
+        AnimatedButton msgBtn = new AnimatedButton("Message", FacebookGUI.FB_GREEN, FacebookGUI.FB_GREEN_HOVER);
+        msgBtn.setPreferredSize(new Dimension(120, 38));
+        msgBtn.setCornerRadius(19); // Super round (half of 38 height)
+        msgBtn.addActionListener(e -> {
+            if (homePage != null) {
+                homePage.openChatWithFriend(user.getCredentials().getUsername());
+            }
         });
+
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        actions.setOpaque(false);
+        actions.add(msgBtn);
+
+        row.add(actions, BorderLayout.EAST);
+        return row;
     }
 
     private JPanel createRequestRow(User user) {
@@ -206,11 +266,11 @@ public class FriendsPanel extends JPanel {
         actions.setOpaque(false);
 
         AnimatedButton confirmBtn = new AnimatedButton("Confirm", FacebookGUI.FB_BLUE, FacebookGUI.FB_BLUE_HOVER);
-        confirmBtn.setPreferredSize(new Dimension(100, 36));
+        confirmBtn.setPreferredSize(new Dimension(110, 38));
 
         AnimatedButton deleteBtn = new AnimatedButton("Delete", new Color(228, 230, 235), new Color(210, 213, 218));
         deleteBtn.setForeground(Color.BLACK);
-        deleteBtn.setPreferredSize(new Dimension(100, 36));
+        deleteBtn.setPreferredSize(new Dimension(110, 38));
 
         confirmBtn.addActionListener(e -> {
             Database.WriteFriend(user.getCredentials().getUsername());
@@ -239,14 +299,12 @@ public class FriendsPanel extends JPanel {
         String username = user.getCredentials().getUsername();
         boolean isFriend = Database.Already_Friend(user);
         boolean requestSent = Database.F_Request_Already_sent(username);
-        // Note: We should also check if they sent US a request, but typically "Add
-        // Friend" covers logic or we show "Respond"
-        // For simplicity, following CLI logic primarily.
 
         JButton actionBtn;
 
         if (isFriend) {
             actionBtn = new JButton("Friends");
+            actionBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
             actionBtn.setEnabled(false);
         } else if (requestSent) {
             actionBtn = new AnimatedButton("Cancel Request", new Color(228, 230, 235), new Color(210, 213, 218));
@@ -263,7 +321,7 @@ public class FriendsPanel extends JPanel {
             });
         }
 
-        actionBtn.setPreferredSize(new Dimension(140, 36));
+        actionBtn.setPreferredSize(new Dimension(140, 38));
 
         actions.add(actionBtn);
         row.add(actions, BorderLayout.EAST);
@@ -272,14 +330,12 @@ public class FriendsPanel extends JPanel {
 
     // Helper to generic row with profile pic and name
     private JPanel createBaseCard(User user) {
-        JPanel row = new JPanel(new BorderLayout(15, 0));
+        JPanel row = new JPanel(new BorderLayout(20, 0)); // Increased gap
         row.setBackground(Color.WHITE);
-        row.setBorder(new EmptyBorder(10, 15, 10, 15));
-        row.setMaximumSize(new Dimension(600, 80));
-        row.setPreferredSize(new Dimension(600, 80));
-
-        // Round corners implementation usually requires custom paint, but for
-        // simplicity here standard panel
+        row.setBorder(new EmptyBorder(15, 20, 15, 20)); // Increased padding
+        row.setMaximumSize(new Dimension(800, 90)); // Increased height
+        row.setPreferredSize(new Dimension(800, 90));
+        row.setAlignmentX(Component.LEFT_ALIGNMENT); // Align left
 
         // Profile Icon
         JLabel profile = new JLabel() {
@@ -288,28 +344,28 @@ public class FriendsPanel extends JPanel {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(FacebookGUI.FB_BLUE);
-                g2.fillOval(0, 0, 50, 50);
+                g2.fillOval(0, 0, 60, 60); // Bigger profile
 
                 g2.setColor(Color.WHITE);
-                g2.setFont(new Font("Segoe UI", Font.BOLD, 18));
+                g2.setFont(new Font("Segoe UI", Font.BOLD, 22)); // Bigger initial
                 String initial = user.getFirstname().substring(0, 1).toUpperCase();
                 FontMetrics fm = g2.getFontMetrics();
-                int x = (50 - fm.stringWidth(initial)) / 2;
-                int y = (50 + fm.getAscent() - fm.getDescent()) / 2;
+                int x = (60 - fm.stringWidth(initial)) / 2;
+                int y = (60 + fm.getAscent() - fm.getDescent()) / 2;
                 g2.drawString(initial, x, y);
                 g2.dispose();
             }
         };
-        profile.setPreferredSize(new Dimension(50, 50));
+        profile.setPreferredSize(new Dimension(60, 60));
 
         // Info
-        JPanel info = new JPanel(new GridLayout(2, 1));
+        JPanel info = new JPanel(new GridLayout(2, 1, 0, 4));
         info.setOpaque(false);
         JLabel name = new JLabel(user.getFullName());
-        name.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        name.setFont(new Font("Segoe UI", Font.BOLD, 20)); // Bigger Name
 
-        JLabel sub = new JLabel(user.getCredentials().getUsername()); // Or bio?
-        sub.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        JLabel sub = new JLabel(user.getCredentials().getUsername());
+        sub.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         sub.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
 
         info.add(name);
@@ -321,27 +377,12 @@ public class FriendsPanel extends JPanel {
         return row;
     }
 
-    // Quick helper for "All Friends" generic button
-    private JPanel createRowBase(User user, String[] btnTexts, ActionListener action) {
-        JPanel row = createBaseCard(user);
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        actions.setOpaque(false);
-
-        for (String text : btnTexts) {
-            JButton btn = new JButton(text);
-            btn.addActionListener(action);
-            actions.add(btn);
-        }
-        row.add(actions, BorderLayout.EAST);
-        return row;
-    }
-
     private void addEmptyMessage(String msg) {
         JLabel label = new JLabel(msg);
-        label.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         label.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        contentPanel.add(Box.createVerticalStrut(30));
+        contentPanel.add(Box.createVerticalStrut(40));
         contentPanel.add(label);
     }
 
