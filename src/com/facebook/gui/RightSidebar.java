@@ -3,7 +3,6 @@ package com.facebook.gui;
 import com.facebook.Database;
 import com.facebook.Main;
 import com.facebook.User;
-import com.facebook.gui.components.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -17,13 +16,11 @@ import java.util.ArrayList;
  */
 public class RightSidebar extends JPanel {
 
-    private FacebookGUI parent;
     private HomePage homePage;
     private JPanel friendsListPanel;
     private JPanel groupChatsPanel;
 
     public RightSidebar(FacebookGUI parent, HomePage homePage) {
-        this.parent = parent;
         this.homePage = homePage;
         setBackground(Color.WHITE);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

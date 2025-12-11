@@ -211,13 +211,13 @@ public class GamesDialog extends JDialog {
                     try {
                         if (gameName.equals("TicTacToe")) {
                             TicTacToe ticTacToe = new TicTacToe();
-                            ticTacToe.Start_game();
+                            ticTacToe.Game_launch();
                         } else if (gameName.equals("Hangman")) {
                             Hangman hangman = new Hangman();
-                            hangman.Start_game();
+                            hangman.Game_launch();
                         } else if (gameName.equals("Snake")) {
                             SnakeGame snake = new SnakeGame();
-                            snake.Start_game();
+                            snake.Game_launch();
                         }
                     } catch (Exception e) {
                         SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(parent,

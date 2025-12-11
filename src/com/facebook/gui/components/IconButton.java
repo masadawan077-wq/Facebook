@@ -12,14 +12,12 @@ import java.awt.event.*;
 public class IconButton extends JButton {
 
     private String icon;
-    private String tooltip;
     private boolean isActive;
     private boolean isHovered;
     private int badgeCount = 0;
 
     public IconButton(String icon, String tooltip, boolean active) {
         this.icon = icon;
-        this.tooltip = tooltip;
         this.isActive = active;
 
         setPreferredSize(new Dimension(112, 40));

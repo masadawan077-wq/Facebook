@@ -1,7 +1,6 @@
 package com.facebook.gui;
 
 import com.facebook.Main;
-import com.facebook.gui.components.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -15,11 +14,9 @@ import java.awt.event.*;
  */
 public class LeftSidebar extends JPanel {
 
-    private FacebookGUI parent;
     private HomePage homePage;
 
     public LeftSidebar(FacebookGUI parent, HomePage homePage) {
-        this.parent = parent;
         this.homePage = homePage;
         setBackground(FacebookGUI.FB_BACKGROUND);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -41,8 +38,7 @@ public class LeftSidebar extends JPanel {
         }));
 
         // Friends
-        add(createMenuItem("👥", "Friends", e -> {
-        }));
+        add(createMenuItem("👥", "Friends", e -> homePage.showFriendsPanel()));
 
         // Memories
         add(createMenuItem("⏰", "Memories", e -> {
@@ -65,7 +61,7 @@ public class LeftSidebar extends JPanel {
         }));
 
         // Feeds
-        add(createMenuItem("📰", "Feeds", e -> homePage.refreshFeed()));
+        add(createMenuItem("📰", "Feeds", e -> homePage.showFeedPanel()));
 
         // Events
         add(createMenuItem("📅", "Events", e -> {

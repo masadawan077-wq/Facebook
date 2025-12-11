@@ -80,6 +80,7 @@ public class FacebookGUI extends JFrame {
         mainPanel.add(signupPanel, "SIGNUP");
 
         add(mainPanel);
+
         showLoginPanel();
     }
 
