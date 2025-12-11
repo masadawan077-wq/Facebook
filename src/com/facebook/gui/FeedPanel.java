@@ -20,12 +20,10 @@ import java.util.ArrayList;
 public class FeedPanel extends JPanel {
 
     private FacebookGUI parent;
-    private HomePage homePage;
     private JPanel postsContainer;
 
     public FeedPanel(FacebookGUI parent, HomePage homePage) {
         this.parent = parent;
-        this.homePage = homePage;
         setBackground(FacebookGUI.FB_BACKGROUND);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(new EmptyBorder(20, 0, 20, 0));
@@ -311,6 +309,18 @@ public class FeedPanel extends JPanel {
             }
         });
 
+        // Privacy selector
+        String[] privacyOptions = { "Friends", "Friends of Friends", "Everyone" };
+        JComboBox<String> privacyCombo = new JComboBox<>(privacyOptions);
+        privacyCombo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        privacyCombo.setBackground(new Color(240, 242, 245));
+        privacyCombo.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        JPanel privacyPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        privacyPanel.setBackground(Color.WHITE);
+        privacyPanel.add(new JLabel("Who can see this? "));
+        privacyPanel.add(privacyCombo);
+
         JScrollPane scrollPane = new JScrollPane(contentArea);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(219, 223, 231)));
 
@@ -324,9 +334,20 @@ public class FeedPanel extends JPanel {
                 String path = Database.Write_Post(newPost);
                 Database.WriteFeed(path, Main.current.getCredentials().getUsername(), newPost);
 
-                // Add to friends' feeds
-                ArrayList<String> friends = Database.Load_Friends(Main.current.getCredentials().getUsername());
-                Main.Add_in_Feed(friends, path, newPost, false);
+                // Determine audience based on selection
+                int selectedPrivacy = privacyCombo.getSelectedIndex();
+                java.util.List<String> recipients;
+
+                if (selectedPrivacy == 0) { // Friends
+                    recipients = Database.Load_Friends(Main.current.getCredentials().getUsername());
+                } else if (selectedPrivacy == 1) { // Friends of Friends
+                    recipients = Database.Load_everyone(2);
+                } else { // Everyone
+                    recipients = Database.Load_everyone(6);
+                }
+
+                // Add to feeds
+                Main.Add_in_Feed(recipients, path, newPost, false);
 
                 dialog.dispose();
                 refreshFeed();
@@ -334,7 +355,10 @@ public class FeedPanel extends JPanel {
         });
 
         panel.add(title, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(privacyPanel, BorderLayout.NORTH);
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(centerPanel, BorderLayout.CENTER);
         panel.add(postBtn, BorderLayout.SOUTH);
 
         dialog.add(panel);
@@ -362,7 +386,8 @@ public class FeedPanel extends JPanel {
             commentItem.setBorder(new EmptyBorder(10, 10, 10, 10));
             commentItem.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
 
-            JLabel commentText = new JLabel("<html>" + comment.getSender() + ": " + comment.getContent() + "</html>");
+            JLabel commentText = new JLabel(
+                    "<html><b>" + comment.getSender() + "</b>: " + comment.getContent() + "</html>");
             commentText.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 
             commentItem.add(commentText);
@@ -383,8 +408,12 @@ public class FeedPanel extends JPanel {
 
         sendBtn.addActionListener(e -> {
             String commentText = commentField.getText().trim();
-            if (!commentText.isEmpty()) {
-                Comment newComment = Main.Input_Comment();
+            if (!commentText.isEmpty() && !commentText.equals("Write a comment...")) {
+                // Create comment directly instead of using Main.Input_Comment() which uses
+                // Scanner
+                String senderName = Main.current.getFirstname() + " " + Main.current.getLastname();
+                Comment newComment = new Comment(commentText, senderName);
+
                 Database.Write_Comment(post, newComment);
 
                 if (!post.getSender().equals(Main.current.getCredentials().getUsername())) {

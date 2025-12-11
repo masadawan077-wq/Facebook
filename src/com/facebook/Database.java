@@ -164,7 +164,7 @@ public class Database {
 
     public static void Delete_Game_invite(Game_Invite invite) {
         File fldr = new File(GameseInvitesfldr, Main.current.getCredentials().getUsername());
-        File file = new File(fldr, invite.getFilepath() + invite.getGame().getName());
+        File file = new File(fldr, invite.getFilepath() + invite.getGame());
         file.delete();
     }
 
@@ -192,7 +192,7 @@ public class Database {
 
     public static void Write_Game_Invite(String username, Game_Invite invite) {
         File fldr = new File(GameseInvitesfldr, username);
-        File file = new File(fldr, invite.getFilepath() + invite.getGame().getName());
+        File file = new File(fldr, invite.getFilepath() + invite.getGame());
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(invite);
         } catch (Exception e) {

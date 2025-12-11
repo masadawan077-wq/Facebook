@@ -11,7 +11,7 @@ public class Main {
     public static User current;
 
     public static void main(String[] args) {
-        test_data();
+
         if (Database.Check_Database()) {
             System_Start();
         }
