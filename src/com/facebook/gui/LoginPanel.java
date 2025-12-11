@@ -50,57 +50,39 @@ public class LoginPanel extends JPanel {
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         leftPanel.setBorder(new EmptyBorder(0, 0, 100, 50));
 
-        // Facebook Logo
-        JLabel logoLabel = new JLabel("facebook") {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                // Apply gradient for premium look
-                GradientPaint gradient = new GradientPaint(
-                        0, 0, new Color(24, 119, 242),
-                        getWidth(), 0, new Color(66, 103, 178));
-                g2.setPaint(gradient);
-                g2.setFont(getFont());
-                FontMetrics fm = g2.getFontMetrics();
-                g2.drawString(getText(), 0, fm.getAscent());
-                g2.dispose();
-            }
-        };
+        // Facebook Logo - Simplified (no gradient for minimalism)
+        JLabel logoLabel = new JLabel("facebook");
         logoLabel.setFont(new Font("Helvetica Neue", Font.BOLD, 60));
-        logoLabel.setForeground(FacebookGUI.FB_BLUE);
+        logoLabel.setForeground(new Color(24, 119, 242));
         logoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Tagline
+        // Tagline - Lighter font
         JLabel taglineLabel = new JLabel(
                 "<html><div style='width: 400px;'>Facebook helps you connect and share<br>with the people in your life.</div></html>");
-        taglineLabel.setFont(new Font("Segoe UI", Font.PLAIN, 26));
-        taglineLabel.setForeground(FacebookGUI.FB_TEXT_PRIMARY);
+        taglineLabel.setFont(new Font("Segoe UI", Font.PLAIN, 24));
+        taglineLabel.setForeground(new Color(96, 103, 112));
         taglineLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        taglineLabel.setBorder(new EmptyBorder(15, 0, 0, 0));
+        taglineLabel.setBorder(new EmptyBorder(20, 0, 0, 0));
 
         leftPanel.add(logoLabel);
         leftPanel.add(taglineLabel);
 
         // ==================== RIGHT SIDE - Login Form ====================
-        RoundedPanel loginCard = new RoundedPanel(8);
+        RoundedPanel loginCard = new RoundedPanel(12);
         loginCard.setBackground(Color.WHITE);
-        loginCard.setLayout(new BoxLayout(loginCard, BoxLayout.Y_AXIS));
-        loginCard.setBorder(new EmptyBorder(20, 20, 25, 20));
+        loginCard.setLayout(new GridBagLayout());
+        loginCard.setBorder(new EmptyBorder(30, 25, 30, 25));
 
         // Fixed size to prevent overflow
         int cardWidth = 400;
-        int cardHeight = 370;
+        int cardHeight = 400;
         loginCard.setPreferredSize(new Dimension(cardWidth, cardHeight));
         loginCard.setMinimumSize(new Dimension(cardWidth, cardHeight));
         loginCard.setMaximumSize(new Dimension(cardWidth, cardHeight));
 
         // Email/Phone field
         emailField = new ModernTextField("Email address or phone number");
-        emailField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52));
-        emailField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        emailField.setPreferredSize(new Dimension(350, 52));
         emailField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -112,8 +94,7 @@ public class LoginPanel extends JPanel {
 
         // Password field
         passwordField = new ModernPasswordField("Password");
-        passwordField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52));
-        passwordField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        passwordField.setPreferredSize(new Dimension(350, 52));
         passwordField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -127,54 +108,77 @@ public class LoginPanel extends JPanel {
         errorLabel = new JLabel(" ");
         errorLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         errorLabel.setForeground(FacebookGUI.FB_ERROR);
-        errorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        errorLabel.setBorder(new EmptyBorder(5, 5, 0, 0));
 
         // Login button
-        loginButton = new AnimatedButton("Log in", FacebookGUI.FB_BLUE, FacebookGUI.FB_BLUE_HOVER);
-        loginButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52));
-        loginButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        loginButton.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        loginButton = new AnimatedButton("Log in", new Color(24, 119, 242), new Color(66, 103, 178));
+        loginButton.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        loginButton.setPreferredSize(new Dimension(350, 48));
         loginButton.addActionListener(e -> performLogin());
 
         // Forgot password link
         forgotPasswordLink = new LinkLabel("Forgotten password?");
         forgotPasswordLink.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        forgotPasswordLink.setAlignmentX(Component.CENTER_ALIGNMENT);
         forgotPasswordLink.addActionListener(e -> showForgotPasswordDialog());
 
         // Separator line
         JSeparator separator = new JSeparator();
-        separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
         separator.setForeground(new Color(218, 220, 224));
-        separator.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Create new account button
-        JPanel buttonContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonContainer.setOpaque(false);
-        buttonContainer.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
-
         createAccountButton = new AnimatedButton("Create new account", FacebookGUI.FB_GREEN,
                 FacebookGUI.FB_GREEN_HOVER);
-        createAccountButton.setPreferredSize(new Dimension(200, 50));
-        createAccountButton.setFont(new Font("Segoe UI", Font.BOLD, 17));
+        createAccountButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        createAccountButton.setPreferredSize(new Dimension(200, 48));
         createAccountButton.addActionListener(e -> parent.showSignupPanel());
 
-        buttonContainer.add(createAccountButton);
+        // Layout components with GridBagLayout for perfect alignment
+        GridBagConstraints cardGbc = new GridBagConstraints();
+        cardGbc.gridx = 0;
+        cardGbc.fill = GridBagConstraints.HORIZONTAL;
+        cardGbc.weightx = 1.0;
+        cardGbc.insets = new Insets(0, 0, 0, 0);
 
-        // Add components to login card with spacing
-        loginCard.add(emailField);
-        loginCard.add(Box.createVerticalStrut(12));
-        loginCard.add(passwordField);
-        loginCard.add(errorLabel);
-        loginCard.add(Box.createVerticalStrut(15));
-        loginCard.add(loginButton);
-        loginCard.add(Box.createVerticalStrut(20));
-        loginCard.add(forgotPasswordLink);
-        loginCard.add(Box.createVerticalStrut(20));
-        loginCard.add(separator);
-        loginCard.add(Box.createVerticalStrut(20));
-        loginCard.add(buttonContainer);
+        // Email field
+        cardGbc.gridy = 0;
+        loginCard.add(emailField, cardGbc);
+
+        // Spacing
+        cardGbc.gridy = 1;
+        cardGbc.insets = new Insets(15, 0, 0, 0);
+        loginCard.add(passwordField, cardGbc);
+
+        // Error label
+        cardGbc.gridy = 2;
+        cardGbc.insets = new Insets(5, 5, 0, 0);
+        cardGbc.fill = GridBagConstraints.NONE;
+        cardGbc.anchor = GridBagConstraints.WEST;
+        loginCard.add(errorLabel, cardGbc);
+
+        // Login button
+        cardGbc.gridy = 3;
+        cardGbc.insets = new Insets(18, 0, 0, 0);
+        cardGbc.fill = GridBagConstraints.HORIZONTAL;
+        loginCard.add(loginButton, cardGbc);
+
+        // Forgot password link
+        cardGbc.gridy = 4;
+        cardGbc.insets = new Insets(22, 0, 0, 0);
+        cardGbc.anchor = GridBagConstraints.CENTER;
+        cardGbc.fill = GridBagConstraints.NONE;
+        loginCard.add(forgotPasswordLink, cardGbc);
+
+        // Separator
+        cardGbc.gridy = 5;
+        cardGbc.insets = new Insets(25, 0, 0, 0);
+        cardGbc.fill = GridBagConstraints.HORIZONTAL;
+        loginCard.add(separator, cardGbc);
+
+        // Create account button
+        cardGbc.gridy = 6;
+        cardGbc.insets = new Insets(25, 0, 0, 0);
+        cardGbc.anchor = GridBagConstraints.CENTER;
+        cardGbc.fill = GridBagConstraints.NONE;
+        loginCard.add(createAccountButton, cardGbc);
 
         // ==================== Footer ====================
         JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -182,29 +186,39 @@ public class LoginPanel extends JPanel {
 
         JLabel createPageLabel = new JLabel(
                 "<html><span style='font-weight:bold;'>Create a Page</span> for a celebrity, brand or business.</html>");
-        createPageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        createPageLabel.setForeground(FacebookGUI.FB_TEXT_PRIMARY);
+        createPageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        createPageLabel.setForeground(new Color(96, 103, 112));
         footerPanel.add(createPageLabel);
 
         // ==================== Add to container ====================
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.insets = new Insets(0, 0, 0, 30);
+        gbc.insets = new Insets(0, 0, 0, 40);
         containerPanel.add(leftPanel, gbc);
 
         gbc.gridx = 1;
-        gbc.insets = new Insets(0, 30, 0, 0);
+        gbc.insets = new Insets(0, 40, 0, 0);
         containerPanel.add(loginCard, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(40, 0, 0, 0);
+        gbc.insets = new Insets(50, 0, 30, 0);
         containerPanel.add(footerPanel, gbc);
 
-        // Add container to main panel
-        add(containerPanel);
+        // Wrap container in scroll pane for responsiveness
+        JScrollPane scrollPane = new JScrollPane(containerPanel);
+        scrollPane.setBorder(null);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        // Add scroll pane to main panel
+        setLayout(new BorderLayout());
+        add(scrollPane, BorderLayout.CENTER);
     }
 
     private void performLogin() {
@@ -310,54 +324,60 @@ public class LoginPanel extends JPanel {
     }
 
     private void showForgotPasswordDialog() {
-        // Create custom dialog
+        // Create custom dialog with proper sizing
         JDialog dialog = new JDialog(parent, "Forgot Password", true);
-        dialog.setSize(450, 400);
+        dialog.setSize(500, 400);
         dialog.setLocationRelativeTo(parent);
-        dialog.setResizable(false);
+        dialog.setResizable(true);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(new EmptyBorder(30, 30, 30, 30));
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
         panel.setBackground(Color.WHITE);
 
         JLabel titleLabel = new JLabel("Reset Your Password");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel instructionLabel = new JLabel(
-                "<html><div style='width: 350px; padding-top: 15px;'>Enter your username below and prove your identity to reset your password.</div></html>");
-        instructionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+                "<html><div style='width: 400px;'>Enter your username below and prove your identity to reset your password.</div></html>");
+        instructionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         instructionLabel.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
         instructionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        // Fixed width text fields to prevent overflow
         ModernTextField usernameField = new ModernTextField("Username");
-        usernameField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        usernameField.setPreferredSize(new Dimension(420, 50));
+        usernameField.setMaximumSize(new Dimension(420, 50));
         usernameField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         ModernTextField firstNameField = new ModernTextField("First Name");
-        firstNameField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        firstNameField.setPreferredSize(new Dimension(420, 50));
+        firstNameField.setMaximumSize(new Dimension(420, 50));
         firstNameField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         ModernTextField lastNameField = new ModernTextField("Last Name");
-        lastNameField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        lastNameField.setPreferredSize(new Dimension(420, 50));
+        lastNameField.setMaximumSize(new Dimension(420, 50));
         lastNameField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         AnimatedButton searchButton = new AnimatedButton("Verify Identity", FacebookGUI.FB_BLUE,
                 FacebookGUI.FB_BLUE_HOVER);
-        searchButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        searchButton.setPreferredSize(new Dimension(420, 45));
+        searchButton.setMaximumSize(new Dimension(420, 45));
         searchButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         searchButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
 
         panel.add(titleLabel);
+        panel.add(Box.createVerticalStrut(10));
         panel.add(instructionLabel);
-        panel.add(Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(18));
         panel.add(usernameField);
         panel.add(Box.createVerticalStrut(12));
         panel.add(firstNameField);
         panel.add(Box.createVerticalStrut(12));
         panel.add(lastNameField);
-        panel.add(Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(18));
         panel.add(searchButton);
 
         searchButton.addActionListener(e -> {
@@ -380,44 +400,55 @@ public class LoginPanel extends JPanel {
             }
         });
 
-        dialog.add(panel);
+        // Wrap in scroll pane
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setBorder(null);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        dialog.add(scrollPane);
         dialog.setVisible(true);
     }
 
     private void showNewPasswordDialog(User user) {
         JDialog dialog = new JDialog(parent, "New Password", true);
-        dialog.setSize(400, 300);
+        dialog.setSize(480, 310);
         dialog.setLocationRelativeTo(parent);
-        dialog.setResizable(false);
+        dialog.setResizable(true);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(new EmptyBorder(30, 30, 30, 30));
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
         panel.setBackground(Color.WHITE);
 
         JLabel titleLabel = new JLabel("Create New Password");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        // Fixed width password fields
         ModernPasswordField newPassField = new ModernPasswordField("New password");
-        newPassField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        newPassField.setPreferredSize(new Dimension(400, 50));
+        newPassField.setMaximumSize(new Dimension(400, 50));
         newPassField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         ModernPasswordField confirmPassField = new ModernPasswordField("Confirm password");
-        confirmPassField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        confirmPassField.setPreferredSize(new Dimension(400, 50));
+        confirmPassField.setMaximumSize(new Dimension(400, 50));
         confirmPassField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         AnimatedButton saveButton = new AnimatedButton("Save Password", FacebookGUI.FB_GREEN,
                 FacebookGUI.FB_GREEN_HOVER);
-        saveButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        saveButton.setPreferredSize(new Dimension(400, 45));
+        saveButton.setMaximumSize(new Dimension(400, 45));
         saveButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         panel.add(titleLabel);
-        panel.add(Box.createVerticalStrut(25));
+        panel.add(Box.createVerticalStrut(20));
         panel.add(newPassField);
         panel.add(Box.createVerticalStrut(12));
         panel.add(confirmPassField);
-        panel.add(Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(18));
         panel.add(saveButton);
 
         saveButton.addActionListener(e -> {
@@ -454,11 +485,19 @@ public class LoginPanel extends JPanel {
             dialog.dispose();
         });
 
-        dialog.add(panel);
+        // Wrap in scroll pane
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setBorder(null);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        dialog.add(scrollPane);
         dialog.setVisible(true);
     }
 
     private void startFadeInAnimation() {
+        // Simple fade in animation - works better with GridBagLayout
         fadeInTimer = new Timer(20, e -> {
             opacity += 0.05f;
             if (opacity >= 1f) {

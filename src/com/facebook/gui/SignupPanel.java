@@ -50,71 +50,129 @@ public class SignupPanel extends JPanel {
     }
 
     private void initComponents() {
-        // ==================== Main Container ====================
-        JPanel containerPanel = new JPanel(new BorderLayout(0, 30));
-        containerPanel.setOpaque(false);
+        // ==================== Main Content Panel ====================
+        // Use GridBagLayout for vertical stacking and centering
+        JPanel contentPanel = new JPanel(new GridBagLayout());
+        contentPanel.setOpaque(false);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(20, 0, 20, 0); // Padding around logo
+        gbc.anchor = GridBagConstraints.CENTER;
 
         // ==================== TOP - Logo ====================
-        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        logoPanel.setOpaque(false);
+        // Simplified logo - no gradient for minimalism
+        JLabel logoLabel = new JLabel("facebook");
+        logoLabel.setFont(new Font("Helvetica Neue", Font.BOLD, 50));
+        logoLabel.setForeground(new Color(24, 119, 242));
 
-        JLabel logoLabel = new JLabel("facebook") {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                GradientPaint gradient = new GradientPaint(
-                        0, 0, new Color(24, 119, 242),
-                        getWidth(), 0, new Color(66, 103, 178));
-                g2.setPaint(gradient);
-                g2.setFont(getFont());
-                FontMetrics fm = g2.getFontMetrics();
-                g2.drawString(getText(), 0, fm.getAscent());
-                g2.dispose();
-            }
-        };
-        logoLabel.setFont(new Font("Helvetica Neue", Font.BOLD, 52));
-        logoLabel.setForeground(FacebookGUI.FB_BLUE);
-        logoPanel.add(logoLabel);
+        contentPanel.add(logoLabel, gbc);
 
         // ==================== CENTER - Signup Card ====================
-        RoundedPanel signupCard = new RoundedPanel(8);
+        RoundedPanel signupCard = new RoundedPanel(10);
         signupCard.setBackground(Color.WHITE);
-        signupCard.setLayout(new BoxLayout(signupCard, BoxLayout.Y_AXIS));
-        signupCard.setBorder(new EmptyBorder(20, 25, 25, 25));
+        signupCard.setLayout(new BorderLayout()); // Changed to BorderLayout for inner scroll
+        signupCard.setBorder(new EmptyBorder(20, 24, 20, 24));
 
-        // Fixed size to prevent overflow - increased height
-        int cardWidth = 450;
-        int cardHeight = 650;
+        // Compact, centered card like Facebook
+        int cardWidth = 460; // Increased to 460 to prevent clipping
+        int cardHeight = 580;
         signupCard.setPreferredSize(new Dimension(cardWidth, cardHeight));
         signupCard.setMinimumSize(new Dimension(cardWidth, cardHeight));
-        signupCard.setMaximumSize(new Dimension(cardWidth, cardHeight));
 
+        // Internal form panel that holds the content
+        JPanel formContent = new JPanel();
+        formContent.setLayout(new BoxLayout(formContent, BoxLayout.Y_AXIS));
+        formContent.setBackground(Color.WHITE);
+        formContent.setBorder(new EmptyBorder(0, 0, 0, 10)); // Gap for scrollbar
+
+        populateSignupCard(formContent);
+
+        // Inner Scroll Pane
+        JScrollPane innerScroll = new JScrollPane(formContent);
+        innerScroll.setBorder(null);
+        innerScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        innerScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        innerScroll.getVerticalScrollBar().setUnitIncrement(16);
+
+        // Mini Scroll Bar Style
+        innerScroll.getVerticalScrollBar().setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(200, 200, 200);
+                this.trackColor = Color.WHITE;
+            }
+
+            @Override
+            protected JButton createDecreaseButton(int orientation) {
+                return createZeroButton();
+            }
+
+            @Override
+            protected JButton createIncreaseButton(int orientation) {
+                return createZeroButton();
+            }
+
+            private JButton createZeroButton() {
+                JButton jbutton = new JButton();
+                jbutton.setPreferredSize(new Dimension(0, 0));
+                jbutton.setMinimumSize(new Dimension(0, 0));
+                jbutton.setMaximumSize(new Dimension(0, 0));
+                return jbutton;
+            }
+
+            @Override
+            public Dimension getPreferredSize(JComponent c) {
+                return new Dimension(8, super.getPreferredSize(c).height); // Thin width
+            }
+        });
+
+        signupCard.add(innerScroll, BorderLayout.CENTER);
+
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 30, 0); // Bottom padding
+        contentPanel.add(signupCard, gbc);
+
+        // ==================== Scroll Pane ====================
+        // Wrap content in scroll pane (Outer scroll disabled)
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setBorder(null);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER); // Disabled outer
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        // Add scroll pane to main panel
+        setLayout(new BorderLayout());
+        add(scrollPane, BorderLayout.CENTER);
+    }
+
+    private void populateSignupCard(JPanel signupCard) {
         // Title
         JLabel titleLabel = new JLabel("Create a new account");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         titleLabel.setForeground(FacebookGUI.FB_TEXT_PRIMARY);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Subtitle
         JLabel subtitleLabel = new JLabel("It's quick and easy.");
-        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         subtitleLabel.setForeground(FacebookGUI.FB_TEXT_SECONDARY);
         subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Separator after title
         JSeparator titleSep = new JSeparator();
         titleSep.setForeground(new Color(218, 220, 224));
-        titleSep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-        titleSep.setAlignmentX(Component.LEFT_ALIGNMENT);
+        titleSep.setPreferredSize(new Dimension(360, 1));
+        titleSep.setMaximumSize(new Dimension(360, 1));
+        titleSep.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // ==================== Name Row ====================
         JPanel nameRow = new JPanel(new GridLayout(1, 2, 12, 0));
         nameRow.setOpaque(false);
-        nameRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52));
-        nameRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+        nameRow.setPreferredSize(new Dimension(360, 52));
+        nameRow.setMaximumSize(new Dimension(360, 52));
+        nameRow.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         firstNameField = new ModernTextField("First name");
         lastNameField = new ModernTextField("Surname");
@@ -125,8 +183,9 @@ public class SignupPanel extends JPanel {
         // ==================== Date of Birth Section ====================
         JPanel dobLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         dobLabelPanel.setOpaque(false);
-        dobLabelPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-        dobLabelPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        dobLabelPanel.setPreferredSize(new Dimension(360, 25));
+        dobLabelPanel.setMaximumSize(new Dimension(360, 25));
+        dobLabelPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel dobLabel = new JLabel("Date of birth ");
         dobLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -157,8 +216,9 @@ public class SignupPanel extends JPanel {
         // Date combo boxes
         JPanel dobRow = new JPanel(new GridLayout(1, 3, 12, 0));
         dobRow.setOpaque(false);
-        dobRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
-        dobRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+        dobRow.setPreferredSize(new Dimension(360, 45));
+        dobRow.setMaximumSize(new Dimension(360, 45));
+        dobRow.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Create day combo (1-31)
         Integer[] days = new Integer[31];
@@ -194,8 +254,9 @@ public class SignupPanel extends JPanel {
         // ==================== Gender Section ====================
         JPanel genderLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         genderLabelPanel.setOpaque(false);
-        genderLabelPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-        genderLabelPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        genderLabelPanel.setPreferredSize(new Dimension(360, 25));
+        genderLabelPanel.setMaximumSize(new Dimension(360, 25));
+        genderLabelPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel genderLabel = new JLabel("Gender ");
         genderLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -222,18 +283,21 @@ public class SignupPanel extends JPanel {
         genderLabelPanel.add(genderInfoIcon);
 
         genderPanel = new GenderRadioPanel();
-        genderPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
-        genderPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        genderPanel.setPreferredSize(new Dimension(360, 45));
+        genderPanel.setMaximumSize(new Dimension(360, 45));
+        genderPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // ==================== Email/Phone ====================
         emailField = new ModernTextField("Mobile number or email address");
-        emailField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52));
-        emailField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        emailField.setPreferredSize(new Dimension(360, 52));
+        emailField.setMaximumSize(new Dimension(360, 52));
+        emailField.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // ==================== Password ====================
         passwordField = new ModernPasswordField("New password");
-        passwordField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52));
-        passwordField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        passwordField.setPreferredSize(new Dimension(360, 52));
+        passwordField.setMaximumSize(new Dimension(360, 52));
+        passwordField.setAlignmentX(Component.CENTER_ALIGNMENT);
         passwordField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -244,87 +308,85 @@ public class SignupPanel extends JPanel {
         });
 
         // ==================== Terms Text ====================
-        JLabel termsLabel = new JLabel("<html><div style='width: 380px; font-size: 11px; color: #65676b;'>" +
+        JLabel termsLabel = new JLabel("<html><div style='width: 340px; font-size: 11px; color: #65676b;'>" +
                 "People who use our service may have uploaded your contact information to Facebook. " +
                 "<a href='#' style='color: #1877f2;'>Learn more</a>." +
                 "</div></html>");
         termsLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        termsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        termsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel policyLabel = new JLabel("<html><div style='width: 380px; font-size: 11px; color: #65676b;'>" +
+        JLabel policyLabel = new JLabel("<html><div style='width: 340px; font-size: 11px; color: #65676b;'>" +
                 "By clicking Sign Up, you agree to our <a href='#' style='color: #1877f2;'>Terms</a>, " +
                 "<a href='#' style='color: #1877f2;'>Privacy Policy</a> and " +
                 "<a href='#' style='color: #1877f2;'>Cookies Policy</a>. " +
                 "You may receive SMS notifications from us and can opt out at any time." +
                 "</div></html>");
         policyLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        policyLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        policyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // ==================== Error Label ====================
         errorLabel = new JLabel(" ");
-        errorLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        errorLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         errorLabel.setForeground(FacebookGUI.FB_ERROR);
-        errorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         errorLabel.setBorder(new EmptyBorder(5, 0, 0, 0));
 
-        // ==================== Signup Button ====================
+        // ==================== Button ====================
         JPanel buttonContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonContainer.setOpaque(false);
-        buttonContainer.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
+        buttonContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         signupButton = new AnimatedButton("Sign Up", FacebookGUI.FB_GREEN, FacebookGUI.FB_GREEN_HOVER);
-        signupButton.setPreferredSize(new Dimension(200, 40));
+        signupButton.setPreferredSize(new Dimension(194, 36));
         signupButton.setFont(new Font("Segoe UI", Font.BOLD, 18));
         signupButton.addActionListener(e -> performSignup());
-
         buttonContainer.add(signupButton);
 
-        // ==================== Already have account link ====================
+        // ==================== Already have account? ====================
         JPanel loginLinkPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         loginLinkPanel.setOpaque(false);
-        loginLinkPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        loginLinkPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         loginLink = new LinkLabel("Already have an account?");
+        loginLink.setForeground(FacebookGUI.FB_BLUE);
         loginLink.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        loginLink.addActionListener(e -> parent.showLoginPanel());
-
+        loginLink.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                parent.showLoginPanel();
+            }
+        });
         loginLinkPanel.add(loginLink);
 
         // ==================== Add all to card ====================
         signupCard.add(titleLabel);
-        signupCard.add(Box.createVerticalStrut(5));
+        signupCard.add(Box.createVerticalStrut(4));
         signupCard.add(subtitleLabel);
-        signupCard.add(Box.createVerticalStrut(12));
+        signupCard.add(Box.createVerticalStrut(10));
         signupCard.add(titleSep);
-        signupCard.add(Box.createVerticalStrut(15));
+        signupCard.add(Box.createVerticalStrut(12));
         signupCard.add(nameRow);
-        signupCard.add(Box.createVerticalStrut(12));
+        signupCard.add(Box.createVerticalStrut(10));
         signupCard.add(dobLabelPanel);
-        signupCard.add(Box.createVerticalStrut(5));
+        signupCard.add(Box.createVerticalStrut(4));
         signupCard.add(dobRow);
-        signupCard.add(Box.createVerticalStrut(12));
+        signupCard.add(Box.createVerticalStrut(10));
         signupCard.add(genderLabelPanel);
-        signupCard.add(Box.createVerticalStrut(5));
+        signupCard.add(Box.createVerticalStrut(4));
         signupCard.add(genderPanel);
-        signupCard.add(Box.createVerticalStrut(12));
+        signupCard.add(Box.createVerticalStrut(10));
         signupCard.add(emailField);
-        signupCard.add(Box.createVerticalStrut(10));
+        signupCard.add(Box.createVerticalStrut(8));
         signupCard.add(passwordField);
-        signupCard.add(Box.createVerticalStrut(10));
+        signupCard.add(Box.createVerticalStrut(8));
         signupCard.add(termsLabel);
-        signupCard.add(Box.createVerticalStrut(5));
+        signupCard.add(Box.createVerticalStrut(4));
         signupCard.add(policyLabel);
         signupCard.add(errorLabel);
-        signupCard.add(Box.createVerticalStrut(12));
-        signupCard.add(buttonContainer);
         signupCard.add(Box.createVerticalStrut(10));
+        signupCard.add(buttonContainer);
+        signupCard.add(Box.createVerticalStrut(8));
         signupCard.add(loginLinkPanel);
-
-        // ==================== Add to container ====================
-        containerPanel.add(logoPanel, BorderLayout.NORTH);
-        containerPanel.add(signupCard, BorderLayout.CENTER);
-
-        add(containerPanel);
     }
 
     private void performSignup() {

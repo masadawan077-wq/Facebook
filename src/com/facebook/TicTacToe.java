@@ -44,7 +44,7 @@ public class TicTacToe extends Game implements Serializable {
     // FONT_BTN removed as we draw manually
     private final Font FONT_UI = new Font("Segoe UI", Font.PLAIN, 16);
 
-    TicTacToe() {
+    public TicTacToe() {
         super("TIC TAC TOE", "DUAL PLAYER");
     }
 
