@@ -3,37 +3,30 @@ package com.facebook;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
-import java.io.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
-public class Hangman extends Game implements Serializable {
+public class Hangman extends Game {
     private static final long serialVersionUID = 1L;
 
-    // Logic Variables
     private String word = "";
     private char[] letters;
     private boolean[] found;
     private int tries = 6;
-    private String filename;
-    private String[] players = new String[2];
     private boolean isVsComputer = false;
 
-    // Animation
     private float drawProgress = 0f;
-    private int animatingLimbIndex = -1; // Which limb is currently drawing? 6=none, 5=head, etc.
+    private int animatingLimbIndex = -1;
 
-    // GUI
     private transient JFrame frame;
     private transient HangmanPanel gamePanel;
-    private transient Timer onlineTimer;
+
     private transient Timer animTimer;
     private transient JPanel keyboardPanel;
     private transient JButton[] keyButtons;
 
-    // Colors
     private final Color CLR_BG = Color.decode("#121212");
     private final Color CLR_PANEL = Color.decode("#1E1E1E");
     private final Color CLR_BTN = Color.decode("#252525");
@@ -44,10 +37,7 @@ public class Hangman extends Game implements Serializable {
 
     private final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 40);
     private final Font FONT_HEADER = new Font("Segoe UI", Font.BOLD, 22);
-    private final Font FONT_UI = new Font("Segoe UI", Font.PLAIN, 16);
-    private final Font FONT_BTN = new Font("Segoe UI", Font.BOLD, 14);
 
-    // Word Lists
     private final String[] EASY_WORDS = { "JAVA", "CODE", "GAME", "BYTE", "LOOP", "BUG", "WEB", "APP", "GUI", "KEY" };
     private final String[] MEDIUM_WORDS = { "PYTHON", "SERVER", "CLIENT", "SCRIPT", "OBJECT", "STRING", "MEMORY",
             "SOCKET" };
@@ -60,12 +50,9 @@ public class Hangman extends Game implements Serializable {
 
     @Override
     public void Game_launch() {
-        SwingUtilities.invokeLater(this::showMainMenu);
+        SwingUtilities.invokeLater(this::MainMenu);
     }
 
-    // ==========================================
-    // UI Helpers
-    // ==========================================
     private void setupFrame(String title) {
         if (frame != null)
             frame.dispose();
@@ -78,8 +65,6 @@ public class Hangman extends Game implements Serializable {
         frame.getContentPane().setBackground(CLR_BG);
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                if (onlineTimer != null && onlineTimer.isRunning())
-                    onlineTimer.stop();
                 if (animTimer != null && animTimer.isRunning())
                     animTimer.stop();
             }
@@ -163,10 +148,7 @@ public class Hangman extends Game implements Serializable {
         return btn;
     }
 
-    // ==========================================
-    // Menu
-    // ==========================================
-    private void showMainMenu() {
+    private void MainMenu() {
         setupFrame("Hangman - Premium");
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
@@ -196,22 +178,18 @@ public class Hangman extends Game implements Serializable {
         p.add(Box.createVerticalStrut(20));
     }
 
-    // ==========================================
-    // Game Screen
-    // ==========================================
-    private void showGameScreen(String title, boolean isOnline) {
+    private void showGameScreen(String title) {
         frame.getContentPane().removeAll();
         frame.setTitle(title);
 
         JPanel main = new JPanel(new BorderLayout());
         main.setBackground(CLR_BG);
 
-        // Drawing Area
         gamePanel = new HangmanPanel();
         main.add(gamePanel, BorderLayout.CENTER);
 
         // Keyboard Area
-        keyboardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10)); // Fluid layout
+        keyboardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         keyboardPanel.setBackground(CLR_BG);
         keyboardPanel.setBorder(new EmptyBorder(30, 50, 30, 50));
         keyboardPanel.setPreferredSize(new Dimension(900, 200));
@@ -225,7 +203,7 @@ public class Hangman extends Game implements Serializable {
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
                     if (!isEnabled()) {
-                        g2.setColor(new Color(30, 30, 30)); // Disabled
+                        g2.setColor(new Color(30, 30, 30));
                     } else if (getModel().isRollover()) {
                         g2.setColor(CLR_ACCENT);
                     } else {
@@ -260,11 +238,9 @@ public class Hangman extends Game implements Serializable {
         }
         main.add(keyboardPanel, BorderLayout.SOUTH);
 
-        // Header Panel with centered title
         JPanel topObj = new JPanel(new BorderLayout());
         topObj.setBackground(CLR_BG);
 
-        // Wrapper panel to truly center the title
         JPanel centerWrapper = new JPanel(new GridBagLayout());
         centerWrapper.setOpaque(false);
         JLabel turnLabel = new JLabel(title, SwingConstants.CENTER);
@@ -313,12 +289,10 @@ public class Hangman extends Game implements Serializable {
     }
 
     private void handleForfeit() {
-        if (onlineTimer != null && onlineTimer.isRunning())
-            onlineTimer.stop();
         if (animTimer != null && animTimer.isRunning())
             animTimer.stop();
         String message = isVsComputer ? "Computer Won! Word: " + word : "You Lost! Word: " + word;
-        showEndDialog(message, false);
+        EndScreen(message, false);
     }
 
     private class HangmanPanel extends JPanel {
@@ -342,14 +316,9 @@ public class Hangman extends Game implements Serializable {
             g2.setStroke(new BasicStroke(2));
             g2.drawLine(centerX, 0, centerX, startY);
 
-            // Draw Man (Neon Style)
             g2.setColor(CLR_ACCENT);
             g2.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-            // Parts Logic:
-            // 6=None, 5=Head, 4=Body, 3=L Arm, 2=R Arm, 1=L Leg, 0=R Leg
-
-            // Draw FULLY established parts (those with index > tries)
             if (tries < 6)
                 drawHead(g2, centerX, startY, 1.0f);
             if (tries < 5)
@@ -403,11 +372,9 @@ public class Hangman extends Game implements Serializable {
         }
 
         private void drawHead(Graphics2D g2, int cx, int sy, float p) {
-            int r = 25; // Radius
-            // Draw arc based on progress (0 to 360)
+            int r = 25;
             int angle = (int) (360 * p);
             g2.drawArc(cx - r, sy, r * 2, r * 2, 90, angle);
-            // Glow
             g2.setStroke(new BasicStroke(8, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             g2.setColor(CLR_ACCENT_GLOW);
             g2.drawArc(cx - r, sy, r * 2, r * 2, 90, angle);
@@ -456,10 +423,6 @@ public class Hangman extends Game implements Serializable {
         }
     }
 
-    // ==========================================
-    // Logic - Offline
-    // ==========================================
-
     private void showDifficultyDialog() {
         JDialog d = new JDialog(frame, "Select Difficulty", true);
         d.setUndecorated(true);
@@ -485,19 +448,19 @@ public class Hangman extends Game implements Serializable {
 
         btnEasy.addActionListener(e -> {
             d.dispose();
-            startOfflineGame(EASY_WORDS[rnd.nextInt(EASY_WORDS.length)], true);
+            OfflineMode(EASY_WORDS[rnd.nextInt(EASY_WORDS.length)], true);
         });
         btnMed.addActionListener(e -> {
             d.dispose();
-            startOfflineGame(MEDIUM_WORDS[rnd.nextInt(MEDIUM_WORDS.length)], true);
+            OfflineMode(MEDIUM_WORDS[rnd.nextInt(MEDIUM_WORDS.length)], true);
         });
         btnHard.addActionListener(e -> {
             d.dispose();
-            startOfflineGame(HARD_WORDS[rnd.nextInt(HARD_WORDS.length)], true);
+            OfflineMode(HARD_WORDS[rnd.nextInt(HARD_WORDS.length)], true);
         });
         btnCancel.addActionListener(e -> {
             d.dispose();
-            showMainMenu();
+            MainMenu();
         });
 
         p.add(Box.createVerticalStrut(30));
@@ -544,11 +507,11 @@ public class Hangman extends Game implements Serializable {
                 return;
             }
             d.dispose();
-            startOfflineGame(w, false);
+            OfflineMode(w, false);
         });
         btnCancel.addActionListener(e -> {
             d.dispose();
-            showMainMenu();
+            MainMenu();
         });
 
         p.add(Box.createVerticalStrut(30));
@@ -564,12 +527,12 @@ public class Hangman extends Game implements Serializable {
         d.setVisible(true);
     }
 
-    private void startOfflineGame(String w, boolean vsCpu) {
+    private void OfflineMode(String w, boolean vsCpu) {
         this.word = w;
         this.isVsComputer = vsCpu;
         initData(w.length());
         this.letters = w.toCharArray();
-        showGameScreen(vsCpu ? "Hangman - Vs Computer" : "Hangman - PvP", false);
+        showGameScreen(vsCpu ? "Hangman - Vs Computer" : "Hangman - PvP");
     }
 
     private void initData(int len) {
@@ -600,7 +563,6 @@ public class Hangman extends Game implements Serializable {
         if (!hit) {
             tries--;
             flashBackground(Color.decode("#330000"));
-            // Start Animation
             startLimbAnimation(tries);
         } else {
             btn.setBackground(Color.decode("#006400"));
@@ -608,18 +570,18 @@ public class Hangman extends Game implements Serializable {
         }
 
         if (allFound) {
-            Timer t = new Timer(500, e -> showEndDialog("YOU WON! Word: " + word, true));
+            Timer t = new Timer(500, e -> EndScreen("YOU WON! Word: " + word, true));
             t.setRepeats(false);
             t.start();
         } else if (tries <= 0) {
-            Timer t = new Timer(800, e -> showEndDialog("GAME OVER! Word: " + word, false));
+            Timer t = new Timer(800, e -> EndScreen("GAME OVER! Word: " + word, false));
             t.setRepeats(false);
             t.start();
         }
     }
 
     private void startLimbAnimation(int triesLeft) {
-        animatingLimbIndex = triesLeft; // 5 = Head, 4 = Body... 0 = R Leg
+        animatingLimbIndex = triesLeft;
         drawProgress = 0f;
         if (animTimer != null && animTimer.isRunning())
             animTimer.stop();
@@ -648,7 +610,7 @@ public class Hangman extends Game implements Serializable {
         t.start();
     }
 
-    private void showEndDialog(String msg, boolean win) {
+    private void EndScreen(String msg, boolean win) {
         JDialog d = new JDialog(frame, "Result", true);
         d.setUndecorated(true);
         d.setSize(400, 250);
@@ -683,7 +645,7 @@ public class Hangman extends Game implements Serializable {
         btnMenu.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnMenu.addActionListener(e -> {
             d.dispose();
-            showMainMenu();
+            MainMenu();
         });
 
         p.add(Box.createVerticalStrut(40));

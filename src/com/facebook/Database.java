@@ -18,7 +18,6 @@ public class Database {
     private static final File Gamesefldr = new File(Dadyfolder, "Games");
     private static final File GameseInvitesfldr = new File(Gamesefldr, "GamesInvites");
     public static final File TicTacToefldr = new File(Gamesefldr, "TicTacToe");
-    public static final File HangManfldr = new File(Gamesefldr, "HangMan");
     public static final File Snakegamefldr = new File(Gamesefldr, "SnakeGame");
     private static final File FriendRequestsSentfolder = new File(Friendsfolder, "FriendRequestsSent");
     private static final File FriendRequestsRecievedfolder = new File(Friendsfolder, "FriendRequestsRecieved");
@@ -26,48 +25,6 @@ public class Database {
     private static ArrayList<Notification> unread;
 
     private Database() {
-    }
-
-    public static int Load_tries(String filename) {
-        File fldr = new File(HangManfldr, filename);
-        File file = new File(fldr, "Tries");
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
-            return (int) in.readObject();
-        } catch (Exception s) {
-            System.out.println("error reading file");
-        }
-        return -1;
-    }
-
-    public static void Write_tries(String filename, int tries) {
-        File fldr = new File(HangManfldr, filename);
-        File file = new File(fldr, "Tries");
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
-            out.writeObject(tries);
-        } catch (Exception e) {
-            System.out.println("error");
-        }
-    }
-
-    public static char[] Load_letters(String filename) {
-        File fldr = new File(HangManfldr, filename);
-        File file = new File(fldr, "letters");
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
-            return (char[]) in.readObject();
-        } catch (Exception s) {
-            System.out.println("error reading file");
-        }
-        return null;
-    }
-
-    public static void Write_letters(String filename, char[] letters) {
-        File fldr = new File(HangManfldr, filename);
-        File file = new File(fldr, "letters");
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
-            out.writeObject(letters);
-        } catch (Exception e) {
-            System.out.println("error");
-        }
     }
 
     public static int Load_HighScore() {
@@ -90,73 +47,6 @@ public class Database {
         File file = new File(fldr, "HighScore");
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(score);
-        } catch (Exception e) {
-            System.out.println("error");
-        }
-    }
-
-    public static int Load_Streak(String opponent) {
-        String curr = Main.current.getCredentials().getUsername();
-        File fldr = new File(HangManfldr, curr);
-        File file = new File(fldr, "Streak_" + opponent);
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
-            return (int) in.readObject();
-        } catch (Exception s) {
-            return 0;
-        }
-    }
-
-    public static void Write_Streak(String opponent, int streak) {
-        String curr = Main.current.getCredentials().getUsername();
-        File fldr = new File(HangManfldr, curr);
-        if (!fldr.exists()) {
-            fldr.mkdirs();
-        }
-        File file = new File(fldr, "Streak_" + opponent);
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
-            out.writeObject(streak);
-        } catch (Exception e) {
-            System.out.println("error");
-        }
-    }
-
-    public static boolean[] Load_found_arr(String filename) {
-        File fldr = new File(HangManfldr, filename);
-        File file = new File(fldr, "found");
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
-            return (boolean[]) in.readObject();
-        } catch (Exception s) {
-            System.out.println("error reading file");
-        }
-        return null;
-    }
-
-    public static void Write_found_arr(boolean[] found, String filename) {
-        File fldr = new File(HangManfldr, filename);
-        File file = new File(fldr, "found");
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
-            out.writeObject(found);
-        } catch (Exception e) {
-            System.out.println("error");
-        }
-    }
-
-    public static String Load_Word(String filename) {
-        File fldr = new File(HangManfldr, filename);
-        File file = new File(fldr, "word");
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
-            return (String) in.readObject();
-        } catch (Exception s) {
-            System.out.println("error reading file");
-        }
-        return null;
-    }
-
-    public static void Write_Word(String word, String filename) {
-        File fldr = new File(HangManfldr, filename);
-        File file = new File(fldr, "word");
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
-            out.writeObject(word);
         } catch (Exception e) {
             System.out.println("error");
         }
@@ -1140,8 +1030,8 @@ public class Database {
 
     public static ArrayList<Notification> Load_Unread_Notification() {
         if (unread == null) {
-            Compute_Read_Unread(); // Try to load first
-            if (unread == null) { // If still null (e.g. file issue), init empty
+            Compute_Read_Unread();
+            if (unread == null) {
                 unread = new ArrayList<>();
             }
         }

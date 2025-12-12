@@ -27,8 +27,8 @@ class GameFrame extends JFrame {
     GamePanel panel;
 
     GameFrame() {
-        this.setTitle("Snake Game - Premium");
-        this.setUndecorated(true); // Minimalistic
+        this.setTitle("Snake Game");
+        this.setUndecorated(true);
         panel = new GamePanel(this);
         this.setContentPane(panel);
         this.setResizable(false);
@@ -51,13 +51,11 @@ class GameFrame extends JFrame {
 
 class GamePanel extends JPanel implements ActionListener {
 
-    // Dimensions
     static final int SCREEN_WIDTH = 800;
     static final int SCREEN_HEIGHT = 700;
     static final int UNIT_SIZE = 25;
-    static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
+    static final int GAME_UNITS = (SCREEN_WIDTH / UNIT_SIZE) * (SCREEN_HEIGHT / UNIT_SIZE);
 
-    // Game Logic
     int delay = 80;
     final int x[] = new int[GAME_UNITS];
     final int y[] = new int[GAME_UNITS];
@@ -66,15 +64,13 @@ class GamePanel extends JPanel implements ActionListener {
     int appleX;
     int appleY;
     char direction = 'R';
-    LinkedList<Character> directionQueue = new LinkedList<>(); // Buffer for rapid key presses
+    LinkedList<Character> directionQueue = new LinkedList<>();
     float appleScale = 1.0f;
     boolean appleGrowing = true;
 
-    // Enhanced Logic
     int scoreMultiplier = 1;
     int highScore = 0;
 
-    // Logic States
     enum State {
         MENU, RUNNING, PAUSED
     }
@@ -85,18 +81,15 @@ class GamePanel extends JPanel implements ActionListener {
     Timer timer;
     Random random;
 
-    // UI Helpers
     private JFrame parentFrame;
     private JButton btnPause;
 
-    // Menu Components
     private JPanel menuPanel;
 
-    // Colors
     private final Color CLR_BG = Color.decode("#121212");
     private final Color CLR_PANEL = Color.decode("#1E1E1E");
-    private final Color CLR_ACCENT = Color.decode("#FF4500"); // OrangeRed
-    private final Color CLR_ACCENT_SEC = Color.decode("#FFA500"); // Orange
+    private final Color CLR_ACCENT = Color.decode("#FF4500");
+    private final Color CLR_ACCENT_SEC = Color.decode("#FFA500");
     private final Color CLR_TEXT = Color.decode("#E0E0E0");
     private final Font FONT_HEADER = new Font("Segoe UI", Font.BOLD, 48);
     private final Font FONT_BTN = new Font("Segoe UI", Font.BOLD, 18);
@@ -111,7 +104,7 @@ class GamePanel extends JPanel implements ActionListener {
         this.addKeyListener(new MyKeyAdapter());
 
         setupUI();
-        showMenu();
+        MainMenu();
 
         timer = new Timer(delay, this);
     }
@@ -246,9 +239,8 @@ class GamePanel extends JPanel implements ActionListener {
         });
         btn.addActionListener(al);
 
-        // Hide Continue if game not started
         if (text.equals("CONTINUE")) {
-            btn.setVisible(false); // Initially hidden
+            btn.setVisible(false);
             btn.setName("BTN_CONTINUE");
         }
 
@@ -256,12 +248,11 @@ class GamePanel extends JPanel implements ActionListener {
         menuPanel.add(Box.createVerticalStrut(20));
     }
 
-    private void showMenu() {
+    private void MainMenu() {
         currentState = State.MENU;
         menuPanel.setVisible(true);
         btnPause.setVisible(false);
 
-        // Toggle Continue Button
         for (Component c : menuPanel.getComponents()) {
             if (c instanceof JButton && "BTN_CONTINUE".equals(c.getName())) {
                 c.setVisible(gameStartedOnce);
@@ -270,7 +261,7 @@ class GamePanel extends JPanel implements ActionListener {
         repaint();
     }
 
-    private void startNewGameWithDifficulty(int speedDelay, int multiplier) {
+    private void OfflineMode(int speedDelay, int multiplier) {
         menuPanel.setVisible(false);
         bodyParts = 5;
         applesEaten = 0;
@@ -326,9 +317,8 @@ class GamePanel extends JPanel implements ActionListener {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Draw Score Header
         g2.setColor(CLR_PANEL);
-        g2.fill(new RoundRectangle2D.Float(20, 20, 150, 70, 10, 10)); // Taller for 2 lines
+        g2.fill(new RoundRectangle2D.Float(20, 20, 150, 70, 10, 10));
         g2.setColor(CLR_TEXT);
         g2.setFont(new Font("Segoe UI", Font.BOLD, 18));
         g2.drawString("Score: " + applesEaten, 35, 46);
@@ -337,27 +327,24 @@ class GamePanel extends JPanel implements ActionListener {
         g2.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         g2.drawString("Best: " + Math.max(applesEaten, highScore), 35, 68);
 
-        // Draw Apple (Pulse)
         int aSize = (int) (UNIT_SIZE * appleScale);
         int offset = (UNIT_SIZE - aSize) / 2;
         g2.setColor(Color.RED);
         g2.fillOval(appleX + offset, appleY + offset, aSize, aSize);
-        // Shine
+
         g2.setColor(new Color(255, 150, 150));
         g2.fillOval(appleX + offset + 4, appleY + offset + 4, aSize / 3, aSize / 3);
 
-        // Draw Snake
         for (int i = 0; i < bodyParts; i++) {
-            if (i == 0) { // Head
+            if (i == 0) {
                 g2.setColor(CLR_ACCENT);
                 g2.fillRoundRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE, 12, 12);
-            } else { // Body
+            } else {
                 g2.setColor(CLR_ACCENT_SEC);
                 g2.fillRoundRect(x[i] + 2, y[i] + 2, UNIT_SIZE - 4, UNIT_SIZE - 4, 8, 8);
             }
         }
 
-        // Pause Overlay
         if (currentState == State.PAUSED) {
             g2.setColor(new Color(0, 0, 0, 150));
             g2.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -420,7 +407,7 @@ class GamePanel extends JPanel implements ActionListener {
     private void gameOver() {
         timer.stop();
         gameStartedOnce = false;
-        showGameOverDialog();
+        EndScreen();
     }
 
     private void animate() {
@@ -484,9 +471,6 @@ class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    // ==========================================
-    // Custom Dialogs & Logic
-    // ==========================================
     private JButton createDialogButton(String text) {
         JButton btn = new JButton(text) {
             @Override
@@ -585,12 +569,12 @@ class GamePanel extends JPanel implements ActionListener {
 
         btnEasy.addActionListener(e -> {
             d.dispose();
-            startNewGameWithDifficulty(140, 1);
+            OfflineMode(140, 1);
         });
 
         btnHard.addActionListener(e -> {
             d.dispose();
-            startNewGameWithDifficulty(50, 2);
+            OfflineMode(50, 2);
         });
 
         btnBack.addActionListener(e -> d.dispose());
@@ -608,7 +592,7 @@ class GamePanel extends JPanel implements ActionListener {
         d.setVisible(true);
     }
 
-    private void showGameOverDialog() {
+    private void EndScreen() {
         JDialog d = new JDialog(parentFrame, "Game Over", true);
         d.setUndecorated(true);
         d.setSize(400, 300);
@@ -639,7 +623,7 @@ class GamePanel extends JPanel implements ActionListener {
 
         btnMenu.addActionListener(e -> {
             d.dispose();
-            showMenu();
+            MainMenu();
         });
 
         p.add(Box.createVerticalStrut(30));
@@ -683,7 +667,7 @@ class GamePanel extends JPanel implements ActionListener {
 
         btnMenu.addActionListener(e -> {
             d.dispose();
-            showMenu();
+            MainMenu();
         });
 
         p.add(Box.createVerticalStrut(30));
@@ -698,9 +682,6 @@ class GamePanel extends JPanel implements ActionListener {
         d.setVisible(true);
     }
 
-    // ==========================================
-    // Friend Scoreboard Logic
-    // ==========================================
     private class Info {
         String name;
         int score;
@@ -727,7 +708,6 @@ class GamePanel extends JPanel implements ActionListener {
         head.setBorder(new EmptyBorder(20, 0, 20, 0));
         main.add(head, BorderLayout.NORTH);
 
-        // Use Max Heap (PriorityQueue) for efficient descending order sorting
         PriorityQueue<Info> maxHeap = new PriorityQueue<>((a, b) -> b.score - a.score);
 
         // 1. Get Current User Score
@@ -750,7 +730,6 @@ class GamePanel extends JPanel implements ActionListener {
             }
         }
 
-        // Extract from max heap in descending order
         DefaultListModel<Info> model = new DefaultListModel<>();
         while (!maxHeap.isEmpty()) {
             model.addElement(maxHeap.poll());
@@ -766,7 +745,14 @@ class GamePanel extends JPanel implements ActionListener {
                 p.setBackground(isSelected ? CLR_PANEL : CLR_BG);
                 p.setBorder(new EmptyBorder(10, 20, 10, 20));
 
-                JLabel n = new JLabel((index + 1) + ". " + value.name);
+                int rank = 1;
+                for (int i = 0; i < index; i++) {
+                    if (model.getElementAt(i).score > value.score) {
+                        rank++;
+                    }
+                }
+
+                JLabel n = new JLabel(rank + ". " + value.name);
                 n.setFont(new Font("Segoe UI", Font.PLAIN, 16));
                 n.setForeground(CLR_TEXT);
 
