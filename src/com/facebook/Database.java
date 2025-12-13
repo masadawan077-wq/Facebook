@@ -90,11 +90,6 @@ public class Database {
         }
     }
 
-    public static void Delete_Game_files(File dir, String fldrname) {
-        File fldr = new File(dir, fldrname);
-        deleteFolderRecursive(fldr);
-    }
-
     public static Scoreboard Load_Score_board(File dir, String fldrname) {
         File fldr = new File(dir, fldrname);
         File end = new File(fldr, "scoreboard");
@@ -134,7 +129,6 @@ public class Database {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(end))) {
             out.writeObject(user);
         } catch (Exception e) {
-            System.out.println("error");
         }
     }
 
@@ -156,7 +150,6 @@ public class Database {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(end))) {
             out.writeObject(player);
         } catch (Exception e) {
-            System.out.println("error");
         }
     }
 
@@ -166,7 +159,6 @@ public class Database {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
             return (String) in.readObject();
         } catch (Exception s) {
-            System.out.println("error reading file");
         }
         return null;
     }
@@ -177,7 +169,6 @@ public class Database {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
             return (String[]) in.readObject();
         } catch (Exception s) {
-            // Suppress error (common for first load)
         }
         return null;
     }
@@ -484,18 +475,6 @@ public class Database {
             System.out.println("Error Writing file");
         }
         WriteFriendinFriend(username);
-    }
-
-    public static void RemoveFriend(String username) {
-        File folder = new File(Friendsfolder, Main.current.getCredentials().getUsername());
-        File file = new File(folder, username);
-        if (file.exists())
-            file.delete();
-
-        File folder2 = new File(Friendsfolder, username);
-        File file2 = new File(folder2, Main.current.getCredentials().getUsername());
-        if (file2.exists())
-            file2.delete();
     }
 
     public static void WriteFriendinFriend(String username) {
@@ -1131,11 +1110,8 @@ public class Database {
         Queue<BFSNode> queue = new LinkedList<>();
         HashSet<String> visited = new HashSet<>();
         visited.add(root);
-
         queue.add(new BFSNode(root, 0));
-
         HashSet<String> result = new HashSet<>();
-
         while (!queue.isEmpty()) {
             BFSNode current = queue.poll();
 

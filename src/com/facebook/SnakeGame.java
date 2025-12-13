@@ -111,7 +111,6 @@ class GamePanel extends JPanel implements ActionListener {
     }
 
     private void setupUI() {
-        // Persistent Pause Button
         btnPause = new JButton("II") {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -358,10 +357,8 @@ class GamePanel extends JPanel implements ActionListener {
     }
 
     public void move() {
-        // Process one direction change from queue per move
         if (!directionQueue.isEmpty()) {
             char newDir = directionQueue.poll();
-            // Validate it's not opposite to current direction
             if ((direction == 'U' && newDir != 'D') ||
                     (direction == 'D' && newDir != 'U') ||
                     (direction == 'L' && newDir != 'R') ||
@@ -456,12 +453,8 @@ class GamePanel extends JPanel implements ActionListener {
                 }
             }
 
-            // Add to queue if it's a valid direction change (max 2 buffered inputs)
             if (newDir != '\0' && directionQueue.size() < 2) {
-                // Get the last direction (either from queue or current)
                 char lastDir = directionQueue.isEmpty() ? direction : directionQueue.peekLast();
-
-                // Only add if not opposite to the last direction
                 if ((lastDir == 'U' && newDir != 'D') ||
                         (lastDir == 'D' && newDir != 'U') ||
                         (lastDir == 'L' && newDir != 'R') ||
@@ -503,13 +496,10 @@ class GamePanel extends JPanel implements ActionListener {
 
                 Shape shape = new RoundRectangle2D.Float(2, 2, getWidth() - 4, getHeight() - 4, 15, 15);
                 g2.fill(shape);
-
-                // Border
                 g2.setColor(CLR_ACCENT);
                 g2.setStroke(new BasicStroke(3f));
                 g2.draw(shape);
 
-                // Text
                 if (getModel().isRollover()) {
                     g2.setColor(Color.BLACK);
                 } else {
@@ -601,7 +591,7 @@ class GamePanel extends JPanel implements ActionListener {
 
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBackground(CLR_BG); // Darker
+        p.setBackground(CLR_BG);
         p.setBorder(new LineBorder(CLR_ACCENT, 2));
 
         JLabel l = new JLabel("GAME OVER");
@@ -711,12 +701,10 @@ class GamePanel extends JPanel implements ActionListener {
 
         PriorityQueue<Info> maxHeap = new PriorityQueue<>((a, b) -> b.score - a.score);
 
-        // 1. Get Current User Score
         String curr = Main.current.getCredentials().getUsername();
         int myScore = Database.Load_HighScore();
         maxHeap.add(new Info("You (" + Main.Get_Fullname(curr) + ")", myScore));
 
-        // 2. Get Friends Scores
         ArrayList<String> friends = Database.Load_Friends(curr);
         for (String f : friends) {
             File fldr = new File(Database.Snakegamefldr, f);

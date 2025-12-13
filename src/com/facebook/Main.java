@@ -2,7 +2,6 @@ package com.facebook;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -29,7 +28,6 @@ public class Main {
     }
 
     public static void test_data() {
-
     }
 
     public static boolean Yes_or_No(String n) {
@@ -188,8 +186,7 @@ public class Main {
 
     public static Gender Input_Gender() {
         while (true) {
-            System.out.print("Enter Gender (MALE/FEMALE): ");
-            String gender = scanner.next();
+            String gender = Input_String("Gender (MALE/FEMALE)");
             if (gender.equals("MALE") || gender.equals("FEMALE")) {
                 return Gender.valueOf(gender);
             }

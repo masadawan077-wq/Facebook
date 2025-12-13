@@ -489,7 +489,6 @@ public class Page {
                         Database.Delete_Acc();
                         Main.current = null;
                         System.out.println("Account deleted. Returning to login.");
-                        Database.Delete_Acc();
                         Main.System_Start();
                     }
                 }
@@ -911,7 +910,7 @@ public class Page {
                     if (Admin) {
                         String user = Chose_Friendo();
                         if (user != null) {
-                            chat.getMembers().add(user);
+                            chat.addMember(user);
                             System.out.println("Member Added Successfully!");
                         }
                     } else {
@@ -937,7 +936,7 @@ public class Page {
                 }
                 case 3 -> {
                     if (Admin) {
-                        if (Main.Yes_or_No("Make some else admin, You wont be admin anymore")) {
+                        if (Main.Yes_or_No("Make someone else admin, You wont be admin anymore")) {
                             int index = Main.Input_Int("Index:");
                             if (index < 1 || index > chat.getMembers().size()) {
                                 index--;
