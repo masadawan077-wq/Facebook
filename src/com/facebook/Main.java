@@ -27,9 +27,6 @@ public class Main {
         }
     }
 
-    public static void test_data() {
-    }
-
     public static boolean Yes_or_No(String n) {
         char choice = ' ';
         System.out.print("Are u sure you want to " + n + " (Y/N): ");
@@ -464,8 +461,9 @@ public class Main {
                     post.setTagged(tagged);
                     String path = Database.Write_Post(post);
                     Database.WriteFeed(path, curr, post);
-                    Add_in_Feed(tagged, path, post, true);
-                    System.out.println("Posted!");
+                    for (String tag: tagged){
+                        Database.Write_Notification(tag,Input_NotificationT());
+                    }
                     boolean running = true;
                     while (running) {
                         running = false;
@@ -477,13 +475,13 @@ public class Main {
                         System.out.println("=========================================");
                         switch (Input_Int("Choice")) {
                             case 1 -> {
-                                Add_in_Feed(Database.Load_Friends(curr), path, post, false);
+                                Add_in_Feed(Database.Load_Friends(curr), path, post);
                             }
                             case 2 -> {
-                                Add_in_Feed(Database.Load_everyone(2), path, post, false);
+                                Add_in_Feed(Database.Load_everyone(2), path, post);
                             }
                             case 3 -> {
-                                Add_in_Feed(Database.Load_everyone(6), path, post, false);
+                                Add_in_Feed(Database.Load_everyone(6), path, post);
                             }
                             default -> {
                                 System.out.println("Invalid Choice!");
@@ -491,6 +489,7 @@ public class Main {
                             }
                         }
                     }
+                    System.out.println("Posted!");
                     return;
                 }
                 case 2 -> {
@@ -519,12 +518,9 @@ public class Main {
         }
     }
 
-    public static void Add_in_Feed(List<String> friends, String path, Post post, boolean tagged) {
+    public static void Add_in_Feed(List<String> friends, String path, Post post) {
         for (String f : friends) {
             Database.WriteFeed(path, f, post);
-            if (tagged) {
-                Database.Write_Notification(f, Input_NotificationT());
-            }
         }
     }
 
